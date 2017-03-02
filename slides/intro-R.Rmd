@@ -1,0 +1,382 @@
+---
+title: "Introdução à linguagem R"
+author: "Rodrigo Rocha"
+date: "2 de março de 2017"
+output: html_document
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introdução à linguagem R
+
+Este texto apresenta a linguagem R, mostrando como ela pode ser usada para transformação de dados.
+
+## RStudio
+
+[RStudio](http://rstudio.org/) é um ambiente integrado de desenvolvimento (IDE) para a linguagem R.
+
+### Variáveis e operações
+
+O ambiente R inclui um console no qual pode-se digitar expressões e ver o resultado. Exemplo:
+  
+```{r}
+1 + 1
+```
+
+Como em outras linguagens de programação, pode-se atribuir valores a variáveis. Em R, usa-se o operador de atribuição `<-`. Exemplo:
+  
+```{r}
+x <- 2
+y <- 3
+x + y
+```
+
+Também podemos realizar comparações entre os valores. Exemplo:
+  
+```{r}
+x < y
+```
+
+```{r}
+x == 9
+```
+
+
+### Vetores
+
+R possui a estrutura *vetor*, que é uma lista de elementos do mesmo tipo. Pode-se criar um vetor com a função `c`. Exemplo (notas de 4 alunos em duas provas):
+  
+```{r}
+aluno <- c("Fulano", "Sicrano", "Beltrano", "Zutano")
+prova <- c(4.8, 4.3, 5.7, 8.0)
+trabalho <- c(6.5, 3.6, 6.8, 7.7)
+prova
+```
+
+Algumas operações com vetores:
+  
+```{r}
+# Somar um valor a todos os elementos do vetor
+prova + 2
+```
+```{r}
+# Comparar cada elemento com um valor específico
+prova > 5
+```
+```{r}
+# Comparar cada elemento com um valor específico
+prova == 8.0
+```
+```{r}
+# Somar os elementos correspondentes de dois vetores
+prova + trabalho
+```
+```{r}
+# Exemplo: tirar a média das duas provas
+(prova + trabalho) / 2
+```
+```{r}
+# Acessar o segundo elemento de um vetor
+prova[2]
+```
+```{r}
+# Acessar o terceiro e o quarto elementos de um vetor
+prova[c(FALSE, TRUE, FALSE, TRUE)]
+```
+```{r}
+# Acessar o terceiro e o quarto elementos de um vetor
+# F e T são sinônimos de FALSE e TRUE
+prova[c(F, T, F, T)]
+```
+
+```{r}
+# Acessar somente os elementos de um vetor maiores que 5
+prova[prova > 5]
+```
+```{r}
+# Identificar alunos com nota da prova superior a 5
+aluno[prova > 5]
+```
+
+
+
+Também podemos executar funções sobre os vetores:
+  
+```{r}
+# Comprimento do vetor (número de elementos)
+length(prova)
+```
+```{r}
+# Média entre os valores
+mean(prova)
+```
+```{r}
+# Soma dos valores
+sum(prova)
+```
+```{r}
+# Primeiros dois valores
+head(prova, 2)
+```
+
+Para consultar a documentação de uma função, digite `?` seguido do nome da função. Exemplo:
+  
+```
+?head
+```
+
+### Valores faltando (NA)
+
+Suponha que um dos alunos não fez o trabalho. Usamos a palavra especial `NA` para indicar valores que não existem ou cujo valor é desconhecido. Exemplo:
+  
+```{r}
+aluno <- c("Fulano", "Sicrano", "Beltrano", "Zutano")
+prova <- c(4.8, 4.3, 5.7, 8.0)
+trabalho <- c(NA, 3.6, 6.8, 7.7)
+prova
+```
+
+`NA` é um valor esquisito. Observe:
+
+```{r}
+1 == 1
+NA == NA
+```
+
+Como saber se um valor é `NA`? Usando a função `is.na()`:
+
+```{r}
+is.na(NA)
+```
+
+```{r}
+# Quais trabalhos possuem nota?
+!is.na(trabalho)
+```
+
+
+Voltando ao trabalho...
+
+```{r}
+trabalho
+```
+
+Qual a média das notas do trabalho?
+
+```{r}
+mean(trabalho)
+```
+
+Não é possível determinar a média dos 4 valores uma vez que um valor está faltando. Se quisermos ignorar os valores `NA` e tirar a média somente dos demais valores, devemos chamar a função `mean` passando o valor `TRUE` para o parâmetro `na.rm`:
+  
+```{r}
+mean(trabalho, na.rm=TRUE)
+```
+
+Isso é equivalente a:
+
+```{r}
+mean(trabalho[!is.na(trabalho)])
+```
+
+### Data frames
+
+Data frame é uma das estruturas de dados mais importantes do R, e se assemelha muito a uma tabela em um banco de dados ou a uma planilha com certas restrições. Um data frame é uma lista de vetores de mesmo tamanho, onde cada vetor possui um nome e representa uma coluna da tabela. 
+
+Geralmente os data frames são lidos a partir de arquivos CSV, xlsx ou outros formatos. O formato CSV é suportado nativamente peo R. Exemplo:
+  
+```{r}
+dados <- read.csv('data/tamanhos.txt')
+dados
+```
+
+Você também pode usar o pacote `readr`, que é mais completo. Para instalar o pacote:
+
+```r
+install.packages('readr')
+```
+
+Para usar o pacote:
+
+```r
+library(readr)
+dados <- read_csv('data/tamanhos.txt')
+```
+
+Podemos acessar colunas da tabela (i.e., vetores) usando `$`. Exemplo:
+  
+```{r}
+dados$tamanho
+mean(dados$tamanho)
+```
+
+Algumas funções úteis para data frames:
+  
+```{r}
+# Primeiras 4 linhas
+head(dados, 4)
+
+# Últimas 4 linhas
+tail(dados, 4)
+
+# Número de linhas
+nrow(dados)
+# Número de colunas
+ncol(dados)
+
+# Sumário estatístico
+summary(dados)
+```
+
+### Operações avançadas com a biblioteca dplyr
+
+Se você ainda não o fez, instale a biblioteca `dplyr`:
+  
+```r
+install.packages('dplyr')
+```
+
+Para usar a biblioteca, use `library`:
+  
+```{r results='hide', message=FALSE}
+library(dplyr)
+```
+
+Com a biblioteca dplyr, você pode escrever transformações de dados no seguinte formato:
+  
+```
+dados %>% transformacao1(...) %>% transformacao2(...) %>% ...
+```
+
+O operador `%>%` é chamado de pipe (lê-se "páipe"). Ele pode ser pensado como um cano que transporta os dados do lado esquerdo para o lado direito até chegar no final.
+
+Na prática o `%>%` pega o resultado da chamada de função à sua esquerda e usa esse resultado como primeiro parâmetro da chamada de função que está à sua direita. Exemplo:
+
+```r
+head(dados, 4)
+# é equivalente a
+dados %>% head(4)
+
+tail(dados)
+# é equivalente a
+dados %>% tail()
+```
+
+Com o `%>%` o código tende a ficar mais legível. Por exemplo, como calcular a raiz quadrada da soma dos quadrados dos catetos?
+
+```{r}
+catetos <- c(3, 4)
+sqrt(sum(catetos ** 2))
+```
+
+```{r}
+catetos <- c(3, 4)
+(catetos ** 2) %>% sum() %>% sqrt()
+```
+
+O dplyr possui várias funções de transformação, como veremos a seguir.
+
+#### filter (selecionar linhas)
+
+Seleciona apenas as linhas de um data frame que satisfazem à condição fornecida. Exemplo: selecionar apenas as linhas em que a `versao` é igual a 1:
+  
+```{r}
+dados %>% filter(versao == 1)
+```
+
+Dentro das funções do dplyr, você não precisa escrever `dados$versao`. Note também que `versao == 1` retorna um vetor de verdadeiros e falsos.
+
+Outro exemplo: selecionar apenas as linhas em que o tamanho é maior que 300 ou menor que 30:
+  
+```{r}
+dados %>%
+  filter(tamanho > 300 | tamanho < 30)
+```
+
+(Use `|` para *ou*, `&` para *e*)
+
+Note que pode-se inserir quebras de linha para deixar o código mais legível sem alterar o resultado.
+
+#### arrange (ordenar linhas)
+
+Com o arrange, você especifica as colunas que devem ser usadas na ordenação, em ordem de prioridade, usando `desc` para especificar ordem descendente. Exemplos:
+  
+```{r}
+dados %>%
+  arrange(versao)
+
+dados %>%
+  arrange(classe, desc(tamanho))
+```
+
+Combinando as duas coisas:
+  
+```{r}
+dados %>%
+  filter(classe == 'Tela.java') %>%
+  arrange(versao)
+```
+
+#### select (selecionar colunas)
+
+Seleciona apenas as colunas especificadas. Exemplo:
+  
+```{r}
+dados %>%
+  select(classe, tamanho)
+```
+
+#### .$ (extrair um vetor)
+
+Se você quiser extrair uma coluna como vetor:
+
+```{r}
+dados %>%
+  .$tamanho
+```
+
+#### mutate (criar colunas)
+
+Com o mutate, pode-se criar novas colunas a partir das colunas existentes. Exemplo:
+  
+```{r}
+dados %>%
+  mutate(produto = tamanho * versao,
+         razao = tamanho / versao)
+```
+
+#### sumarise (combinar todas as linhas em uma só)
+
+Exemplos:
+  
+```{r}
+dados %>%
+  summarise(tam_medio = mean(tamanho))
+
+dados %>%
+  summarise(prod_max = max(tamanho * versao),
+            versao_inicial = min(versao))
+```
+
+Algumas funções de agregação: `n` (quantidade de valores), `n_distinct` (quantidade de valores distintos), `max`, `min`, `sum`, `first`, `last`, `nth` (enésimo), `mean` (média), `sd` (desvio-padrão), `median` (mediana).
+
+#### Operações agrupadas com group_by
+
+Você pode agrupar as linhas de acordo com os valores de uma ou mais colunas antes de aplicar o summarise.
+
+```{r}
+dados %>%
+  group_by(classe) %>%
+  summarise(tam_medio = mean(tamanho))
+```
+
+#### inner_join
+
+Para saber mais:
+
+- <http://r4ds.had.co.nz/transform.html>
+- <https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html>
+
+  

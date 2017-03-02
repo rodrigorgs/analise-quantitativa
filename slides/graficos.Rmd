@@ -1,0 +1,14 @@
+---
+  title: "Visualização de dados"
+author: "Rodrigo Rocha"
+date: "2 de março de 2017"
+output: ioslides_presentation
+---
+  
+
+## Para saber mais
+  
+- [R for Data Science: Data visualization](http://r4ds.had.co.nz/data-visualisation.html)
+- [Data Visualization Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2016/11/ggplot2-cheatsheet-2.1.pdf)
+- [Documentação do ggplot2](http://docs.ggplot2.org/current/)
+- [fgplot2: Data Visualization Done Right](http://superbobry.github.io/slides/ggplot2/)

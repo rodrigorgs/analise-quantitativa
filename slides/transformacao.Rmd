@@ -1,0 +1,330 @@
+---
+title: "Transformação de dados"
+author: "Rodrigo Rocha"
+date: "2 de março de 2017"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(htmlTable)
+knitr::opts_chunk$set(echo = FALSE)
+mytable <- function(x, ...) { knitr::asis_output(paste0("<center>", htmlTable(x, ..., rnames=F, css.cell = "padding-left: .5em; padding-right: .2em;"), "</center>")) }
+mycolor <- 'paleturquoise'
+mycolor2 <- 'rosybrown2'
+mycolor3 <- 'palegoldenrod'
+mycolors <- c(mycolor, mycolor2, mycolor3)
+set.seed(0)
+
+library(dplyr, warn.conflicts = F)
+```
+
+
+## Transformação de dados
+
+- Entrada: tabela **arrumada** (tidy)
+    - cada linha é um observação ou caso
+    - cada coluna é uma variável
+- Usaremos a biblioteca `dplyr`
+- Operadores: `filter`, `arrange`, `select`, `mutate`, `summarise`, `group_by`, `inner_join`
+
+## Transformação: filter
+
+Seleciona linhas de acordo com critério. Original:
+  
+```r
+dados <- read.csv('data/tamanhos.txt')
+dados
+```
+  
+<center>
+```{r results='asis'}
+dados <- read.csv('data/tamanhos.txt')
+mytable(dados)
+```
+</center>
+  
+## Transformação: filter
+
+```r
+dados %>% filter(versao == 1)
+```
+
+```{r results='asis'}
+mytable(dados, col.rgroup = ifelse(dados$versao == 1, mycolor, 'white'))
+```
+
+## Transformação: filter
+
+```r
+dados %>% filter(versao == 1)
+```
+
+```{r results='asis'}
+dados %>% filter(versao == 1) %>% mytable()
+```
+
+## Transformação: filter
+
+```r
+dados %>% filter(versao == 1 | versao == 2)
+```
+
+```{r results='asis'}
+dados %>% filter(versao == 1 | versao == 2) %>% mytable()
+```
+
+(Use `|` para *ou* (or), `&` para *e* (and))
+
+## Transformação: arrange
+
+Ordena de acordo o valor de uma ou mais colunas. Original: `dados`
+  
+```{r results='asis'}
+mytable(dados)
+```
+
+## Transformação: arrange
+
+```r
+# ordena por classe e versao
+dados %>% arrange(classe, versao)
+```
+
+```{r results='asis'}
+dados %>% arrange(classe, versao) %>% mytable()
+```
+
+## Transformação: arrange
+
+```r
+# ordem decrescente de tamanho
+dados %>% arrange(desc(tamanho))
+```
+
+```{r results='asis'}
+dados %>% arrange(desc(tamanho)) %>% mytable()
+```
+
+## Combinando transformações
+
+```r
+dados %>%
+  filter(versao == 3) %>%
+  arrange(desc(TLOC))
+```
+
+```{r results='asis'}
+dados %>% filter(versao == 3) %>% arrange(desc(tamanho)) %>% mytable()
+```
+
+
+## Transformação: select
+
+Seleciona colunas. Original:
+  
+```{r results='asis'}
+mytable(dados)
+```
+
+## Transformação: select
+
+```r
+dados %>% select(classe, tamanho)
+```
+
+```{r results='asis'}
+dados %>% select(classe, tamanho) %>% mytable()
+```
+
+(veja a documentação para descobrir mais opções)
+
+## Transformação: rename
+
+```r
+dados %>% rename(linhas = tamanho)
+```
+
+```{r}
+dados %>% rename(linhas = tamanho) %>% mytable()
+```
+
+
+
+## Transformação: mutate
+
+Cria colunas computadas. Original:
+  
+```{r results='asis'}
+mytable(dados)
+```
+
+## Transformação: mutate
+
+```r
+dados %>% mutate(x = tamanho / versao)
+```
+
+```{r results='asis'}
+dados %>% mutate(x = sprintf("%.1f", tamanho / versao)) %>% mytable()
+```
+
+## Transformação: summarise
+
+Combina todos os valores de uma coluna em um único valor (ex.: máximo, mínimo, soma, média...). Original:
+  
+```{r results='asis'}
+mytable(dados)
+```
+
+## Transformação: summarise
+
+```r
+dados %>% summarise(x = max(tamanho), y = min(tamanho))
+```
+
+```{r results='asis'}
+dados %>% summarise(x = max(tamanho), y = min(tamanho)) %>% mytable()
+```
+
+## Transformação: group_by
+
+Agrupa os dados de acordo com o valor de uma ou mais colunas.
+
+```{r results='asis'}
+mytable(dados)
+```
+
+## Transformação: group_by
+
+```r
+dados %>% group_by(versao)
+```
+
+```{r results='asis'}
+mytable(dados, col.rgroup = mycolors[dados$versao])
+```
+
+## Transformação: group_by
+
+```r
+dados %>% group_by(versao)
+```
+
+```{r results='asis'}
+x <- dados %>% arrange(versao)
+x %>% mytable(col.rgroup = mycolors[x$versao])
+```
+
+## Transformação: group_by + summarise
+
+```r
+dados %>%
+  group_by(versao) %>%
+  summarise(total = sum(tamanho))
+```
+
+```{r results='asis'}
+valor <- dados %>%
+  group_by(versao) %>%
+  summarise(total = sum(tamanho))
+
+valor %>% mytable(col.rgroup = mycolors[valor$versao])
+```
+
+## Transformação: inner_join
+
+A operação de inner join junta duas tabelas que se relacionam através de uma ou mais colunas. Primeiramente vamos carregar outra tabela:
+
+```{r echo=T}
+versoes <- read.csv('data/versoes.txt')
+```
+
+```{r}
+versoes %>% mytable()
+```
+
+## Transformação: inner_join
+
+Note que ambas as tabelas (`dados` e `versoes`) possuem uma coluna `versao`. A partir dessa coluna podemos saber, por exemplo, as informações dos arquivos para cada ano.
+
+## Transformação: inner_join
+
+```r
+dados %>%
+  inner_join(versoes, by = "versao")
+```
+
+```{r}
+dados %>% inner_join(versoes, by = "versao") %>% mytable()
+```
+
+## Transformação: inner_join
+
+```r
+versoes %>%
+  inner_join(dados, by = "versao")
+```
+
+```{r}
+versoes %>% inner_join(dados, by = "versao") %>% mytable()
+```
+
+## Transformação: inner_join
+
+Exemplo: qual o maior tamanho de arquivo em cada ano?
+
+```r
+versoes %>%
+  inner_join(dados, by = "versao") %>%
+  group_by(ano) %>%
+  summarise(tamMaximo = max(tamanho))
+```
+
+```{r}
+versoes %>%
+  inner_join(dados, by = "versao") %>%
+  group_by(ano) %>%
+  summarise(tamMaximo = max(tamanho)) %>%
+  mytable()
+```
+
+
+## Transformação: inner_join
+
+Para pesquisar:
+
+- Como fazer a junção de duas tabelas se as colunas possuem nomes diferentes (ex.: `versao` e `num_versao`)
+- Veja funções relacionadas: `left_join`, `full_join` e outras
+
+## Transformação: table
+
+Tabelas de contingência contam o número de vezes que determinadas combinações de valores de variáveis aparecem nos dados.
+
+```{r echo=T}
+x <- versoes %>% inner_join(dados, by = "versao")
+table(x$ano, x$classe)
+```
+
+## Transformação: table
+
+A função `xtabs` faz a mesma coisa da função `table`, com uma sintaxe diferente:
+
+```{r echo=T}
+xtabs(~ ano + classe, data=x)
+```
+
+Também é possível combinar `group_by` e `summarise` para obter o mesmo efeito.
+
+## Para saber mais
+
+- [R for Data Science: Data transformation](http://r4ds.had.co.nz/transform.html)
+- [Data Transformation Cheat Sheet](https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/data-transformation-cheatsheet.pdf)
+- <https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html>
+
+
+<!--
+## Exemplo: Predicting Eclipse Defects
+
+...
+-->

@@ -1,0 +1,44 @@
+---
+title: "Arrumação de dados"
+author: "Rodrigo Rocha"
+date: "2 de março de 2017"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(htmlTable)
+knitr::opts_chunk$set(echo = FALSE)
+mytable <- function(x, ...) { knitr::asis_output(paste0("<center>", htmlTable(x, ..., rnames=F, css.cell = "padding-left: .5em; padding-right: .2em;"), "</center>")) }
+mycolor <- 'paleturquoise'
+mycolor2 <- 'rosybrown2'
+mycolor3 <- 'palegoldenrod'
+mycolors <- c(mycolor, mycolor2, mycolor3)
+set.seed(0)
+
+library(dplyr, warn.conflicts = F)
+library(tidyr, warn.conflicts = F)
+```
+
+
+## Arrumação
+
+- É um tipo de transformação de dados
+- Entrada: tabela desarrumada
+- Saída: tabela **arrumada** (tidy)
+    - cada linha é um observação ou caso
+    - cada coluna é uma variável
+- Usaremos a biblioteca `tidyr`
+- Operadores: `gather`, `spread`, `separate`, `unnest`
+
+## Para saber mais
+
+- [R for Data Science: Tidy data](http://r4ds.had.co.nz/tidy-data.html)
+- [Data Import Cheat Sheet](https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/data-import-cheatsheet.pdf)
+- [CRAN: Tidy data](https://cran.rstudio.com/web/packages/tidyr/vignettes/tidy-data.html)
+
+<!--
+## Exemplo: Predicting Eclipse Defects
+
+...
+-->

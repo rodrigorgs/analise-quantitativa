@@ -1,0 +1,153 @@
+---
+title: "Eclipse metrics"
+author: "Rodrigo Rocha"
+date: "15 de setembro de 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Preparação
+
+```{r message=FALSE}
+library(readr)
+library(dplyr)
+library(pander)
+```
+
+Primeiramente, vamos carregar os dados do artigo [Predicting Defects for Eclipse](https://www.st.cs.uni-saarland.de/publications/files/zimmermann-promise-2007.pdf).
+
+```{r warning=FALSE, message=FALSE}
+data <- read.csv(gzfile('data/eclipse-metrics.csv.gz'))
+```
+
+Eis uma pequena amostra dos dados:
+
+```{r}
+data %>% head() %>% pander()
+```
+
+## Interpretação
+
+O que é uma observação nessa tabela? O que cada linha representa?
+
+Cada linha representa informações sobre um arquivo em uma determinada versão do software Eclipse.
+
+Significado das colunas:
+
+- **version**: versão do Eclipse
+- **plugin**: plugin ao qual o arquivo pertence
+- **filename**: nome do arquivo
+- **pre**: número de defeitos encontrados no arquivo antes do lançamento da versão (pré-release)
+- **post**: número de defeitos encontrados no arquivo após o lançamento da versão (pós-release)
+- **TLOC**: número de linhas de código do arquivo
+- **NOF\_sum**: número total de atributos das classes do arquivo
+- **NOM\_sum**: número total de métodos das classes do arquivo
+- **VG\_avg**: complexidade ciclomática média dos métodos das classes do arquivo
+- **PAR\_avg**: número de parâmetros médio dos métodos das classes do arquivo
+- **MLOC\_avg**: tamanho médio dos métodos das classes do arquivo, em linhas de código
+- **FOUT\_avg**: número médio de chamadas de método dentro de cada método das classes do arquivo (*fan-out*)
+
+<!--
+## Exploração
+
+```{r}
+glimpse(data)
+```
+
+```{r}
+summary(data)
+```
+-->
+
+## Análises
+
+### Quais são as versões, e quantos arquivos tem cada versão?
+
+```{r}
+data %>%
+  group_by(version) %>%
+  summarise(arquivos = n()) %>%
+  pander()
+```
+
+### Qual o número de arquivos em cada versão? E o número de linhas de código? E a média de linhas de código por arquivo? E o número de plugins?
+
+```{r}
+data %>%
+  group_by(version) %>%
+  summarise(arquivos = n(),
+            plugins = n_distinct(plugin),
+            linhas = sum(TLOC),
+            linhasPorArquivo = linhas / arquivos) %>%
+  pander()
+```
+
+### Quais os 5 maiores plugins, em linhas de código, na versão 3.0?
+
+```{r}
+data %>%
+  filter(version == 3.0) %>%
+  group_by(plugin) %>%
+  summarise(loc = sum(TLOC)) %>%
+  arrange(desc(loc)) %>%
+  head(5) %>%
+  pander()
+```
+
+### Quais os plugins com maior densidade de defeitos (defeitos por mil linhas de código) na versão 3.0?
+
+```{r}
+data %>%
+  filter(version == 3.0) %>%
+  group_by(plugin) %>%
+  summarise(loc = sum(TLOC),
+            defeitos = sum(post)) %>%
+  mutate(densidade = 1000 * defeitos / loc) %>%
+  arrange(desc(densidade)) %>%
+  head(5) %>%
+  pander()
+```
+
+### Quais os arquivos com maior densidade de defeitos pós-release na versão 2.0?
+
+```{r}
+data %>%
+  filter(version == 2.0) %>%
+  mutate(densidade = post / TLOC) %>%
+  select(filename, densidade) %>%
+  arrange(desc(densidade)) %>%
+  head(5) %>%
+  pander()
+```
+
+### A densidade de defeitos aumentou ou diminuiu com o tempo?
+
+```{r}
+data %>%
+  group_by(version) %>%
+  summarise(loc = sum(TLOC),
+            defeitos = sum(post)) %>%
+  mutate(densidade = 1000 * defeitos / loc) %>%
+  select(version, densidade) %>%
+  arrange(version) %>%
+  pander()
+```
+
+
+### Quantos arquivos aparecem em uma, duas ou três versões?
+
+```{r}
+data %>%
+  group_by(filename) %>%
+  summarise(versoes = n()) %>%
+  ungroup() %>%
+  group_by(versoes) %>%
+  summarise(arquivos = n()) %>%
+  mutate(perc = 100 * arquivos / sum(arquivos)) %>%
+  pander()
+```
+

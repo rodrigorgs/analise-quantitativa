@@ -1,0 +1,366 @@
+---
+title: "Análise exploratória de dados"
+author: "Rodrigo Rocha"
+date: "2 de março de 2017"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(htmlTable)
+knitr::opts_chunk$set(echo = FALSE)
+mytable <- function(x, ...) { knitr::asis_output(paste0("<center>", htmlTable(x, ..., rnames=F, css.cell = "padding-left: .5em; padding-right: .2em;"), "</center>")) }
+
+library(moments) # skewness
+library(corrplot)
+
+library(dplyr, warn.conflicts = F)
+```
+
+## Análise exploratória
+
+- Ou *exploratory data analysis* (EDA)
+- Consiste em sumarizar e visualizar características importantes de um conjunto de dados.
+- É útil para levantar hipóteses sobre os dados, identificar problemas com os dados (que requerem limpeza)
+- Como:
+    - estatística descritiva
+    - visualização
+
+## Estatística descritiva
+
+- **Univariada** (uma variável) -- calcular, para cada variável:
+    - média, mediana, desvio-padrão, quartis, assimetria, curtose
+    - plotar histograma, boxplot, violin plot (talvez usar escala logarítmica)
+- **Bivariada** (duas variáveis)
+    - correlação/covariância
+    - plotar gráfico de dispersão (scatter plot), tabelas de contingência/mosaic plots
+    - plotar série temporal (se uma das variáveis for tempo)
+
+## Estatística descritiva: exemplo
+
+Vamos considerar uma tabela com o tamanho (linhas de código, `TLOC`) dos arquivos do código-fonte do programa Eclipse, versão 3.0. Para fins didáticos, usaremos uma amostra aleatória de 9 linhas dessa tabela.
+
+```{r}
+f <- gzfile('data/eclipse-metrics.csv.gz')
+open(f)
+eclipse <- read.csv(f)
+close(f)
+eclipse3 <- eclipse %>% filter(version == 3.0)
+eclipse3 <- eclipse3 %>% mutate(file = sub('^.*/', '', filename))
+
+e3sam <- eclipse3 %>% select(file, TLOC) %>% sample_n(9)
+e3sam %>% mytable(align=c('left', 'right'))
+TLOC <- e3sam$TLOC
+```
+
+## Estatística descritiva univariada
+
+- Vamos começar estudando funções que sumarizam um conjunto de valores através de um único valor representativo
+- Exemplo: média, mediana, desvio-padrão, quartis, assimetria, curtose...
+
+## Estatística descritiva: média, desvio-padrão
+
+R possui as funções `mean` (média, é uma medida de tendência central) e `sd` (desvio-padrão, é uma medida de dispersão dos dados):
+
+```{r echo=TRUE}
+mean(TLOC)
+```
+
+```{r echo=TRUE}
+sd(TLOC)
+```
+
+## Estatística descritiva: média, desvio-padrão
+
+Para fins didáticos, mostramos como calcular esses valores usando a fórmula:
+
+```{r echo=TRUE}
+n <- length(TLOC)
+media <- sum(TLOC) / n
+media
+```
+
+```{r echo=TRUE}
+desvioPadrao <- sqrt( sum((TLOC - media) ^ 2) / (n - 1) )
+desvioPadrao
+```
+  
+
+## Estatística descritiva: mínimo, máximo
+
+Identifique os valores mínimo e máximo de `TLOC`:
+  
+```{r}
+e3sam %>% mytable(align=c('left', 'right'))
+```
+
+## Estatística descritiva: mínimo, máximo
+
+Fica mais fácil com a tabela ordenada:
+  
+```{r}
+e3sam %>% arrange(TLOC) %>% mytable(align=c('left', 'right'))
+```
+
+- Mínimo: primeiro valor (da tabela ordenada)
+- Máximo: último valor (da tabela ordenada)
+
+## Estatística descritiva: mediana
+
+- Mediana: elemento do meio
+- Propriedade:
+    - 50% dos elementos são menores que a mediana
+- 50% dos elementos são maiores que a mediana
+
+```{r}
+e3sam %>% arrange(TLOC) %>% mytable(align=c('left', 'right'))
+```
+
+## Estatística descritiva: mediana
+
+```{r}
+x <- TLOC %>% sample(8) %>% sort()
+```
+
+- E se não tiver elemento do meio?
+- Faz interpolação linear entre os dois elementos do meio.
+- Exemplo: x = `r x`; mediana = `r median(x)`
+
+```{r}
+plot(1:length(x), x, type='b', main='', xlab='', ylab='')
+abline(v = 0.5 + length(x) /  2, col='red')
+```
+
+## Estatística descritiva: média vs. mediana
+
+```{r}
+x <- sort(TLOC)
+```
+
+- Média e mediana são medidas de tendência central, que sumarizam um conjunto de valores através de um único valor
+    - A média é mais sensível a valores extremos. Exemplo:
+    - x = `r x`
+- média = `r mean(x)`, mediana = `r median(x)`
+    - x = `r x[length(x)] <- x[length(x)]*9; x` (alteramos o último elemento)
+    - média = `r mean(x)`, mediana = `r median(x)`
+- Não faz sentido falar em média quando os valores são tão variados: basta um milionário virar bilionário para aumentar o PIB per capita, mas isso quer dizer que a população está ganhando mais?
+
+```{r}
+x[length(x)] <- x[length(x)] / 9
+```
+
+## Estatística descritiva: quartil
+
+- Quartis são pontos que dividem os dados ordenados em 4 partes iguais
+    - 1º quartil: maior que 1/4 (25%) dos outros valores
+    - 2º quartil: maior que 2/4 (50%) dos outros valores (mediana)
+    - 3º quartil: maior que 3/4 (75%) dos outros valores
+    - mínimo: maior que 0/4 (0%) dos outros valores
+    - máximo: maior que 4/4 (100%) dos outros valores
+
+## Estatística descritiva: quartil
+
+- x = `r x`; quartis = `r quantile(x, c(0.25, 0.50, 0.75))`
+
+```{r}
+plot(1:length(x), x, type='b', main='', xlab='', ylab='')
+abline(v=quantile(1:length(x), c(0.25, 0.50, 0.75)), col=c('red', 'darkgreen', 'blue'))
+abline(h=quantile(x, c(0.25, 0.50, 0.75)), col=c('red', 'darkgreen', 'blue'))
+```
+
+## Estatística descritiva: quantil
+
+- Quartil pode ser generalizado com o conceito de quantil
+- ex.:
+    - 4-quantil (ou quartil) divide os valores em 4 partes iguais
+    - 3-quantil (ou tercil) divide os valores em 3 partes iguais
+    - 100-quantil (ou percentil) divide os valores em 100 partes iguais
+
+## Estatística descritiva: percentil
+
+- Ex.: 90º percentil = 9º decil = `r quantile(x, .9)`
+
+```{r}
+plot(1:length(x), x, type='b', main='', xlab='', ylab='')
+abline(v=quantile(1:length(x), (0:10) / 10), col='darkgreen', lty=2)
+abline(v=quantile(1:length(x), 0.9), col='red')
+abline(h=quantile(x, 0.9), col='red')
+```
+
+## Estatística descritiva: gráficos
+
+- Até agora vimos medidas que sumarizam um conjunto de dados através de um único valor
+- Com gráficos, conseguimos visualizar melhor a distribuição dos dados
+
+## Estatística descritiva: histograma
+
+- Divide a faixa de valores em partes iguais e conta quantos valores estão em cada faixa
+- Cada faixa de valores é chamada de *bin*.
+
+## Estatística descritiva: histograma
+
+- x = `r x`
+
+```{r echo=TRUE}
+hist(x)
+```
+
+## Estatística descritiva: histograma
+
+- Outro exemplo (fictício)
+
+```{r}
+hist(rnorm(n = 100, sd = 5, mean = 10))
+```
+
+## Estatística descritiva: histograma
+
+- Mais um exemplo
+
+```{r echo=TRUE}
+hist(eclipse3$PAR_avg)
+```
+
+## Estatística descritiva: ecdf
+
+```{r echo=TRUE}
+plot(ecdf(eclipse3$FOUT_avg))
+```
+
+## Estatística descritiva: assimetria
+
+- A partir do histograma pode-se visualizar como os dados estão distribuídos
+- No exemplo anterior, há muito mais valores concentrados nas faixas menores (esquerda) do que nas maiores (direita)
+- Dizemos que a distribuição é assimétrica (possui cauda longa)
+    - especificamente, assimétrica à direita
+- Podemos usar funções da biblioteca `moments` para calcular a assimetria (*skewness*):
+  
+```{r echo=TRUE}
+skewness(eclipse3$PAR_avg)
+```
+
+## Estatística descritiva: curtose
+
+- Indica o quanto a distribuição é espalhada, com valores extremos
+
+```{r echo=TRUE}
+kurtosis(eclipse3$PAR_avg)
+```
+
+
+## Estatística descritiva: boxplot
+
+- Boxplot é um tipo de gráfico usado para visualizar a distribuição dos dados a partir de seus **quartis**
+  
+## {.flexbox .vcenter}
+  
+```{r fig.width=4,fig.height=4, out.width="600px"}
+par(mar=c(2, 2, 2, 2))
+plot(1:length(x), x, type='b', main='', xlab='', ylab='')
+abline(v=quantile(1:length(x), c(0.25, 0.50, 0.75)), col=c('red', 'darkgreen', 'blue'))
+abline(h=quantile(x, c(0.25, 0.50, 0.75)), col=c('red', 'darkgreen', 'blue'))
+```
+
+## {.flexbox .vcenter}
+
+```{r fig.width=4,fig.height=4, out.width="600px"}
+par(mar=c(2, 2, 2, 2))
+boxplot(x)
+```
+
+## Estatística descritiva: boxplot
+
+- boxplot é bom pra comparar várias distribuições
+
+```{r}
+boxplot(Speed ~ Expt, data=morley)
+```
+
+## Estatística descritiva: boxplot
+
+<img src="images/Box-Plot-MTB_01.png" width="768px" />
+  
+## Estatística descritiva: escala logarítmica
+  
+Às vezes os dados estão tão espalhados que é difícil visualizá-los.
+
+<center>
+```{r fig.width=4,fig.height=4, out.width="400px"}
+par(mar=c(2, 2, 2, 2))
+boxplot(eclipse3$TLOC)
+```
+</center>
+  
+## Estatística descritiva: escala logarítmica
+  
+Uma solução é adotar uma escala logarítmica para os eixos do gráfico:
+  
+<center>
+```{r fig.width=4,fig.height=4, out.width="400px"}
+par(mar=c(2, 2, 2, 2))
+boxplot(eclipse3$TLOC, log="y")
+```
+</center>
+  
+## Estatística descritiva bivariada
+  
+- Na estatística descritiva bivariada, buscamos entender o relacionamento entre duas variáveis
+    - Quando `x` cresce, `y` cresce?
+    - Quando `x` cresce, `y` diminui?
+    - `x` e `y` variam na mesma proporção?
+
+## Estatística descritiva: séries temporais
+
+```{r}
+x <- mtcars$wt
+y <- mtcars$disp
+```
+
+```{r}
+plot(x, type='l', ylim=c(0,6))
+lines(y/100, col='red')
+```
+
+## Estatística descritiva: gráfico de dispersão (scatterplot)
+
+```{r}
+plot(x, y)
+```
+
+## Estatística descritiva: gráfico de dispersão (scatterplot)
+
+```{r}
+plot(x, y)
+abline(lm(y ~ x), col='red')
+```
+
+## Estatística descritiva: correlação
+
+- Correlação: [-1, 1]
+
+```{r echo=TRUE}
+cor(x, y)
+```
+
+## Estatística descritiva: correlação
+
+![](./images/correlation.png)
+
+## Exemplo: matriz de correlação
+
+```{r}
+ecor <- eclipse3 %>% select(post, TLOC, VG_avg, PAR_avg, FOUT_avg)
+cor(ecor)
+```
+
+## Exemplo: matriz de correlação
+
+```{r}
+corrplot(cor(ecor))
+```
+
+## Exemplo: scatterplot matrix
+
+```{r}
+plot(ecor %>% select(TLOC, VG_avg, PAR_avg) %>% sample_n(200))
+```

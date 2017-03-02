@@ -1,0 +1,311 @@
+---
+title: "Introdução à linguagem R"
+author: "Rodrigo Rocha"
+date: "September 15, 2016"
+output: html_document
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introdução à linguagem R
+
+Este texto apresenta a linguagem R, mostrando como ela pode ser usada para transformação de dados.
+
+### Variáveis e operações
+
+O ambiente R inclui um console no qual pode-se digitar expressões e ver o resultado. Exemplo:
+  
+```{r}
+1 + 1
+```
+
+Como em outras linguagens de programação, pode-se atribuir valores a variáveis. Em R, usa-se o operador de atribuição `<-`. Exemplo:
+  
+```{r}
+x <- 2
+y <- 3
+x + y
+```
+
+Também podemos realizar comparações entre os valores. Exemplo:
+  
+```{r}
+x < y
+x == 9
+```
+
+
+### Vetores
+
+R possui a estrutura *vetor*, que é uma lista de elementos do mesmo tipo. Pode-se criar um vetor com a função `c`. Exemplo (notas de 4 alunos em duas provas):
+  
+```{r}
+aluno <- c("Fulano", "Sicrano", "Beltrano", "Zutano")
+prova <- c(4.8, 4.3, 5.7, 8.0)
+trabalho <- c(6.5, 3.6, 6.8, 7.7)
+prova
+```
+
+Também pode-se criar um vetor com uma sequência de números usando `:`. Exemplo:
+  
+```{r}
+3:8
+```
+
+
+Algumas operações com vetores:
+  
+```{r}
+# Somar um valor a todos os elementos do vetor
+prova + 2
+
+# Somar os elementos correspondentes de dois vetores
+prova + trabalho
+
+# Exemplo: tirar a média das duas provas
+(prova + trabalho) / 2
+
+# Acessar o segundo elemento de um vetor
+prova[2]
+
+# Acessar o segundo e o quarto elementos de um vetor
+prova[c(2, 4)]
+
+# Comparar cada elemento com um valor específico
+prova > 5
+
+# Acessar o terceiro e o quarto elementos de um vetor
+prova[c(FALSE, TRUE, FALSE, TRUE)]
+
+# Podemos usar as abreviações T para TRUE e F para FALSE
+prova[c(F, T, F, T)]
+
+# Acessar somente os elementos de um vetor maiores que 5
+prova[prova > 5]
+
+# Identificar alunos com nota da prova superior a 5
+aluno[prova > 5]
+
+# Acessar a nota da prova do aluno chamado Sicrano
+prova[aluno == 'Sicrano']
+
+# Identificador alunos com nota da prova superior a 5
+# *ou* nota do trabalho superior a 5
+aluno[prova > 5 | trabalho > 5]
+
+# Identificador alunos com nota da prova superior a 5
+# *e* nota do trabalho superior a 5
+aluno[prova > 5 & trabalho > 5]
+```
+
+Também podemos executar funções sobre os vetores:
+  
+```{r}
+# Comprimento do vetor (número de elementos)
+length(prova)
+
+# Média entre os valores
+mean(prova)
+
+# Soma dos valores
+sum(prova)
+
+# Primeiros dois valores
+head(prova, 2)
+```
+
+Para consultar a documentação de uma função, digite `?` seguido do nome da função. Exemplo:
+  
+```
+?head
+```
+
+
+### Valores faltando (NA)
+
+Suponha que um dos alunos não fez o trabalho. Usamos a palavra especial `NA` para indicar valores que não existem ou cujo valor é desconhecido. Exemplo:
+  
+```{r}
+aluno <- c("Fulano", "Sicrano", "Beltrano", "Zutano")
+prova <- c(4.8, 4.3, 5.7, 8.0)
+trabalho <- c(NA, 3.6, 6.8, 7.7)
+prova
+```
+
+Nesse caso, qual a média das notas do trabalho?
+
+```{r}
+mean(trabalho)
+```
+
+Não é possível determinar a média dos 4 valores uma vez que um valor está faltando. Se quisermos ignorar os valores `NA` e tirar a média somente dos demais valores, devemos chamar a função `mean` passando o valor `TRUE` para o parâmetro `na.rm`:
+  
+```{r}
+mean(trabalho, na.rm=TRUE)
+```
+
+### Data frames
+
+Data frame é uma das estruturas de dados mais importantes do R, e se assemelha muito a uma tabela em um banco de dados ou a uma planilha com certas restrições. Um data frame é uma lista de vetores de mesmo tamanho, onde cada vetor possui um nome e representa uma coluna da tabela. 
+
+Geralmente os data frames são lidos a partir de arquivos CSV, xlsx ou outros formatos. O formato CSV é suportado nativamente peo R. Exemplo:
+  
+```{r}
+dados <- read.csv('data/tamanhos.txt')
+dados
+```
+
+Podemos acessar colunas da tabela (i.e., vetores) usando `$`. Exemplo:
+  
+```{r}
+dados$tamanho
+mean(dados$tamanho)
+```
+
+Também podemos acessar elementos usando a notação `[linha, coluna]`. Exemplo:
+  
+```{r}
+# Acessa a primeira linha do data frame
+dados[1, ]
+
+# Acessa a segunda coluna do data frame
+dados[, 2]
+
+# Acessa o elemento na quarta linha, terceira coluna
+dados[4, 3]
+
+# Acessa as 3 primeiras linhas, duas primeiras colunas
+dados[1:3, 1:2]
+
+# Acessa as primeiras 3 linhas
+dados[1:3, ]
+head(dados, 3)
+```
+
+Algumas funções úteis para data frames:
+  
+```{r}
+# Primeiras 4 linhas
+head(dados, 4)
+
+# Últimas 4 linhas
+tail(dados, 4)
+
+# Número de linhas e colunas
+nrow(dados)
+ncol(dados)
+
+# Sumário estatístico
+summary(dados)
+```
+
+### Operações avançadas com a biblioteca dplyr
+
+Se você ainda não o fez, instale a biblioteca `dplyr`:
+  
+```
+install.packages('dplyr')
+```
+
+Para usar a biblioteca, use `library`:
+  
+```{r results='hide', message=FALSE}
+library(dplyr)
+```
+
+
+Com a biblioteca dplyr, você pode escrever transformações de dados no seguinte formato:
+  
+```
+dados %>% transformacao1(...) %>% transformacao2(...) %>% ...
+```
+
+O operador `%>%` é chamado de pipe (lê-se "páipe"). Ele pode ser pensado como um cano que transporta os dados do lado esquerdo para o lado direito até chegar no final.
+
+O dplyr possui várias funções de transformação, como veremos a seguir.
+
+#### filter (selecionar linhas)
+
+Seleciona apenas as linhas de um data frame que satisfazem à condição fornecida. Exemplo: selecionar apenas as linhas em que a `versao` é igual a 1:
+  
+```{r}
+dados %>% filter(versao == 1)
+```
+
+Outro exemplo: selecionar apenas as linhas em que o tamanho é maior que 300 ou menor que 30:
+  
+```{r}
+dados %>%
+  filter(tamanho > 300 | tamanho < 30)
+```
+
+Note que pode-se inserir quebras de linha para deixar o código mais legível sem alterar o resultado.
+
+#### arrange (ordenar linhas)
+
+Com o arrange, você especifica as colunas que devem ser usadas na ordenação, em ordem de prioridade, usando `desc` para especificar ordem descendente. Exemplos:
+  
+```{r}
+dados %>%
+  arrange(versao)
+
+dados %>%
+  arrange(classe, desc(tamanho))
+```
+
+Combinando as duas coisas:
+  
+```{r}
+dados %>%
+  filter(classe == 'Tela.java') %>%
+  arrange(versao)
+```
+
+#### select (selecionar colunas)
+
+Seleciona apenas as colunas especificadas. Exemplo:
+  
+```{r}
+dados %>%
+  select(classe, tamanho)
+```
+
+#### mutate (criar colunas)
+
+Com o mutate, pode-se criar novas colunas a partir das colunas existentes. Exemplo:
+  
+```{r}
+dados %>%
+  mutate(produto = tamanho * versao,
+         razao = tamanho / versao)
+```
+
+#### sumarise (combinar todas as linhas em uma só)
+
+Exemplos:
+  
+```{r}
+dados %>%
+  summarise(tam_medio = mean(tamanho))
+
+dados %>%
+  summarise(prod_max = max(tamanho * versao),
+            versao_inicial = min(versao))
+```
+
+#### Operações agrupadas com group_by
+
+Você pode agrupar as linhas de acordo com os valores de uma ou mais colunas antes de aplicar o summarise.
+
+```{r}
+dados %>%
+  group_by(classe) %>%
+  summarise(tam_medio = mean(tamanho))
+```
+
+#### inner_join
+
+Para saber mais: <https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html>
+  
