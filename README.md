@@ -14,9 +14,11 @@ Este repositório contém o código-fonte e os dados utilizados na disciplina de
     - [R for Data Science: Data transformation](http://r4ds.had.co.nz/transform.html)
     - [Data Transformation Cheat Sheet](https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/data-transformation-cheatsheet.pdf)
 - Aula 2 (9/3)
-  - Análise exploratória de dados
+  - [Análise exploratória de dados](http://rpubs.com/rodrigorgs/eda) - [código-fonte](slides/eda.Rmd)
   - Visualização de dados (com ggplot2)
-  - Data set GHTorrent
+    - [R for Data Science: Data visualization](http://r4ds.had.co.nz/data-visualisation.html)
+    - [Data Visualization Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2016/11/ggplot2-cheatsheet-2.1.pdf)
+  - Data set GHTorrent (ver abaixo, *Trabalho prático*)
 - Aula 3 (16/3)
   - Noções de probabilidade e estimativa
   - Amostragem
@@ -28,7 +30,7 @@ Este repositório contém o código-fonte e os dados utilizados na disciplina de
 
 ## Trabalho prático
 
-Data set: versão modificada do [GHTorrent MSR 2014](http://ghtorrent.org/msr14.html) (ver [schema](http://ghtorrent.org/relational.html)).
+Data set: [msr14sample](https://www.dropbox.com/s/py6j51vc81wr574/msr14sample.sqlite?dl=0) -- versão modificada do [GHTorrent MSR 2014](http://ghtorrent.org/msr14.html) (ver [schema](http://ghtorrent.org/relational.html)).
 
 Descrição: em breve.
 
