@@ -1,0 +1,98 @@
+---
+title: "GHTorrent: exemplo de análise"
+author: "Rodrigo Rocha"
+date: "16 de março de 2017"
+output: html_document
+---
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Carrega bibliotecas
+# Instale as bibliotecas com o comando install.packages("nome-da-biblioteca").
+library(dplyr)
+library(RSQLite)
+library(pander)
+```
+
+Este é o *template* do trabalho de análise quantitativa da disciplina Engenharia de Software Experimental, no formato R Markdown. No arquivo HTML gerado, o código R deve ser exibido.
+
+## Objetivo geral
+
+(1 parágrafo)
+
+## Questões de pesquisa
+
+- Q1: ...
+- Q2: ...
+
+## Metodologia
+
+Descrever brevemente o data set usado.
+
+Para cada questão, indicar quais métricas e quais análises serão usadas.
+
+## Análise exploratória
+
+```{r}
+# Configura o banco de dados: ver schema em <http://ghtorrent.org/files/schema.pdf>
+sqlite <- src_sqlite('../dataset/msr14sample.sqlite', create = F)
+projects <- sqlite %>% tbl('projects') %>% collect(n = Inf)
+commits <- sqlite %>% tbl('commits') %>% collect(n = Inf)
+```
+
+Sumarizar através de números, tabelas e gráficos os dados relevantes para contextualizar a pesquisa.
+
+Exemplos:
+
+Número de projetos analisados: ```r nrow(projects)```.
+
+Número de commits analisados: ```r nrow(commits)``` commits realizados entre ```r min(commits$created_at)``` e ```r max(commits$created_at)```.
+
+Número de projetos por linguagem:
+
+```{r}
+projects %>%
+  group_by(language) %>%
+  summarise(n_projects = n()) %>%
+  arrange(desc(n_projects)) %>%
+  pander()
+```
+
+Número de commits por linguagem:
+
+```{r}
+projects %>%
+  inner_join(commits, by = c("id" = "project_id")) %>%
+  group_by(language) %>%
+  summarise(n_commits = n()) %>%
+  arrange(desc(n_commits)) %>%
+  pander()
+```
+
+Número de contribuidores por linguagem:
+
+```{r}
+contribuidores <- commits %>%
+  inner_join(projects, by = c("project_id" = "id")) %>%
+  group_by(language) %>%
+  summarise(n_contribuidores = n_distinct(author_id)) %>%
+  arrange(desc(n_contribuidores))
+
+contribuidores %>% pander()
+```
+
+```{r}
+hist(contribuidores$n_contribuidores, xlab="Número de contribuidores", ylab="Número de linguagens", main="Número de contribuidores por linguagem de programação")
+```
+
+## Análises
+
+Indicar os resultados, usando gráficos, estatística descritiva, testes estatísticos...
+
+### RQ1: ...
+
+### RQ2: ...
+
+## Ameaças à validade
+
+Indicar as principais ameaças à validade interna, externa e de construto.
+

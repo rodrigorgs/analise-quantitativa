@@ -28,11 +28,38 @@ Este repositório contém o código-fonte e os dados utilizados na disciplina de
 - Aula 5 (30/3)
   - Correlação, regressão e predição
 
-## Trabalho prático
+## Avaliações
+
+### Análise de artigo (1,0 ponto)
+
+Artigo: [Sentiment Analysis of Commit Comments in GitHub: An Empirical Study](https://www.dropbox.com/s/tf9y3eeox4x1eqh/p352-guzman.pdf?dl=0)
+
+Prazo: 22/03/2017
+
+Elabore uma análise do artigo, em português, contendo os seguintes itens:
+
+- Um parágrafo de resumo do artigo, descrevendo o objetivo, a metodologia e os principais resultados do artigo.
+- Para cada questão de pesquisa:
+  - Descrição da questão
+  - Quais variáveis foram estudadas
+  - Para cada variável estudada: como ela é medida (ou seja, qual a métrica usada), se ela é dependente ou independente, se ela é nominal, ordinal, discreta ou contínua.
+  - Descrição das análises realizadas:
+    - Os dados precisaram ser transformados? Se sim, como?
+    - Foi usada estatística descritiva? Se sim, que estatísticas e gráficos foram apresentados?
+    - Foi usada estatística inferencial? Se sim, quais testes foram realizados? O tamanho do efeito foi medido?
+- Uma sugestão de análise que poderia ter sido realizada para apoiar alguma das questões de pesquisa do artigo ou uma nova questão de pesquisa a sua escolha.
+
+### Trabalho prático (3,0 pontos)
 
 Data set: [msr14sample](https://www.dropbox.com/s/py6j51vc81wr574/msr14sample.sqlite?dl=0) -- versão modificada do [GHTorrent MSR 2014](http://ghtorrent.org/msr14.html) (ver [schema](http://ghtorrent.org/relational.html)).
 
-Descrição: em breve.
+Alguns trabalhos que usam esse data set podem ser encontrados no [programa do MSR Challenge 2014](http://2014.msrconf.org/program.php) (ver sessão das 16:00-17:00, MSR Challenge).
+
+Em duplas, elaborem um relatório de análise do data set, seguindo o padrão do arquivo [exemplo-ghtorrent.Rmd](slides/exemplo-ghtorrent.Rmd), no formato documento R Markdown. Você precisará definir 2 questões de pesquisa.
+
+Publique o relatório no RPubs.com; envie o link e o código-fonte (arquivo `.Rmd`) para <rodrigorgs@ufba.br>
+
+Prazo: 06/04/2017
 
 ## Referências
 
