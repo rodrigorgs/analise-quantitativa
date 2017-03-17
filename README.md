@@ -20,9 +20,8 @@ Este repositório contém o código-fonte e os dados utilizados na disciplina de
     - [Data Visualization Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2016/11/ggplot2-cheatsheet-2.1.pdf)
   - Data set GHTorrent (ver abaixo, *Trabalho prático*)
 - Aula 3 (16/3)
-  - Noções de probabilidade e estimativa
-  - Amostragem
-  - Teste de hipótese
+  - Noções de amostragem, probabilidade e estimativa: [código-fonte](slides/estimativa.Rmd) e [slides complementares](https://docs.google.com/presentation/d/1H4_XZRhjrZnxABet_IXejwPu72e3XlgNoOgZtFrp6oM/edit?usp=sharing)
+  - Ver análise de artigo, valendo 1,0 ponto, para a próxima aula
 - Aula 4 (23/3)
   - Teste de hipótese e tamanho de efeito
 - Aula 5 (30/3)

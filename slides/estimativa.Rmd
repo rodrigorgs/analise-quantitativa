@@ -1,0 +1,262 @@
+---
+title: "Probabilidade, amostragem e estimativa"
+author: "Rodrigo Rocha"
+date: "16 de março de 2017"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(htmlTable)
+knitr::opts_chunk$set(echo = FALSE)
+mytable <- function(x, ...) { knitr::asis_output(paste0("<center>", htmlTable(x, ..., rnames=F, css.cell = "padding-left: .5em; padding-right: .2em;"), "</center>")) }
+
+library(moments) # skewness
+library(corrplot)
+
+library(dplyr, warn.conflicts = F)
+```
+
+## Estatística: descritiva vs. inferencial
+
+- Descritiva:
+    - Descreve, sumariza e tira conclusões sobre os dados coletados
+    - Não tenta generalizar para outros dados
+- Inferencial
+    - A partir dos dados coletados, procura tirar conclusões inclusive sobre dados que não foram coletados!
+    - A partir de uma **amostra**, tenta tirar conclusões sobre um conjunto maior, a **população**
+
+# Amostragem
+
+## Amostragem (sampling)
+
+- População = conjunto de dados sobre os quais queremos tirar conclusões
+- Amostra = subconjunto da população que analisaremos
+- Amostragem = processo de seleção de uma amostra da população
+
+Analisar a população inteira pode ser inviável. Podemos analisar apenas uma amostra e generalizar as conclusões... se a amostra for **representativa** da população.
+
+## Exemplo
+
+- Um professor se afasta no meio do semestre e é substituído por outro professor.
+- O professor substituto deseja ter noção das notas da turma de 40 alunos na prova já realizada.
+- Ele pergunta as notas dos 5 alunos na fileira da frente e conclui que a turma foi muito bem na prova.
+- Perguntas:
+    - Qual é a amostra?
+    - Qual é a população?
+    - A escolha da amostra foi adequada? -- Ela é **enviesada**
+
+## Evidência anedótica
+
+- Evidência baseada em poucos casos
+- Tamanho da amostra = 1 ou 2 ou poucos
+
+## Tipos de amostragem
+
+Os tipos de amostragem mais comuns são:
+
+- amostragem por conveniência
+- amostragem aleatória simples
+- amostragem estratificada
+
+## Amostragem por conveniência
+
+- Seleciona os indivíduos que estão mais próximos, mais disponíveis
+- Ex.: Para tirar conclusões sobre todos os estudantes da UFBA, considerar a amostra dos alunos da disciplina Engenharia de Software Experimental no semestre corrente.
+- Ex. real: pesquisa de intenção de voto presidencial por telefone na década de 1940
+- Geralmente não é uma amostra representativa da população -- viés de seleção
+- Consequentemente não é possível generalizar os resultados da amostra para a população
+- Pode ser usada em estudos piloto
+
+## Viés de seleção (selection bias)
+
+- Seleção de indivíduos para análise que resulta em uma amostra não representativa da população
+- Exemplo:
+    - Para entender o cenário de desenvolvimento de software no Brasil, um pesquisador envia um questionário para todos os desenvolvedores de software do Brasil
+    - Apenas 2% dos contactados respondem o questionário (taxa de resposta)
+    - O que se pode concluir?
+    - Viés de auto-seleção. Viés de não-resposta.
+    - Garanta uma taxa de resposta alta para mitigar o viés
+
+## Viés de seleção (selection bias)
+
+Um dia desses coloquei um questionário na minha página. Olha só o resultado:
+
+**Você costuma responder a questionários online?**
+
+```{r}
+pie(table(c(rep("sim", 98), rep("não", 2))))
+```
+
+O que posso concluir?
+
+## Amostragem aleatória simples
+
+- A seleção é feita de forma aleatória (sorteio)
+- Todos os indivíduos possuem a mesma probabilidade de serem selecionados
+- A seleção de um indivíduo não aumenta nem diminui as chances de outro indivíduo
+
+## Amostragem aleatória simples
+
+- Note que nenhuma amostragem **garante** que a amostra será representativa
+- Em uma amostragem aleatória simples dos estudantes da UFBA, posso acabar selecionando, ao acaso, apenas os estudantes desta turma (mas isso é muito improvável!)
+- A representatividade tende a ser maior quando:
+    - A amostra é grande; ou
+    - A variância da variável estudada na população é pequena
+
+## Amostragem estratificada (stratified sampling)
+
+- Divide a população em subgrupos (homens/mulheres, crianças/adolescentes/adultos, iniciante/experiente), denominados estratos
+- Pega uma amostra aleatória simples de cada estrato, de forma que o tamanho de cada amostra seja proporcional ao tamanho do estrato na população
+- É mais efetiva quando cada estrato possui baixa variância
+
+# Probabilidade
+
+## Probabilidade
+
+- É a medida da chance de um evento ocorrer
+    - P(A): probabilidade do evento A
+- Varia entre 0 (impossível) e 1 (certo, inevitável)
+
+## Visões sobre a probabilidade
+
+- Resultados simétricos
+    - Ao lançar um dado, qual a probabilidade de o dado cair com o número 2 pra cima?
+    - Um dado possui 6 faces. Ao lançar o dado, a probabilidade de cair com determinada face para cima é a mesma para todas as faces. Logo, a probabilidade de cair o número 2 para cima é 1/6 (0.1666...)
+
+## Visões sobre a probabilidade
+
+- Frequência relativa
+    - Se eu jogar um dado várias vezes, à medida que o número de vezes tende a infinito, o número de vezes que a face 2 cai pra cima é ⅙ do total de lançamentos.
+    - Qual a probabilidade de chover amanhã?
+    - Se dos últimos 100.000 dias, em 5% choveu em Salvador, a probabilidade de chover amanhã é de 5%
+    - Mas dos dias do mês corrente dos últimos 5 anos, em 10% houve chuva em Salvador; então a probabilidade de chover amanhã é de 10%...
+
+## Visões sobre a probabilidade
+
+- Subjetiva
+    - Qual a probabilidade de haver uma 3ª guerra mundial este ano?
+    - Especialistas no assunto podem atribuir probabilidades com base em avaliações subjetivas sobre a atual conjuntura política.
+
+## Probabilidade de um resultado
+
+- Probabilidade de um resultado X, P(X):
+    - P(X) = número de vezes que o resultado foi X / número de resultados possíveis
+    - (assumindo que todos os resultados têm a mesma probabilidade)
+- Ex.: probabilidade de a moeda cair com "coroa" para cima (½)
+- Ex.: probabilidade de sortear uma carta do naipe de copas (13/52)
+
+## Probabilidade de dois resultados independentes
+
+- P(A e B) = P(A) * P(B)
+- P(A ou B) = P(A) + P(B) - P(A e B)
+
+## Falácia do apostador
+
+- Uma moeda é lançada 5 vezes e o resultado é coroa 5 vezes.
+- Qual é a probabilidade de o resultado ser cara no próximo lançamento?
+
+## Probabilidade condicional
+
+- Qual a probabilidade de sortear um Ás no baralho? P(carta é Ás) = 4/52
+- Qual a probabilidade de sortear dois ases no baralho?
+- P(1ª carta é Ás e 2ª carta é Ás) = 4/52 * 4/52?
+
+## Probabilidade condicional
+
+- Qual a probabilidade de sortear um Ás no baralho? P(carta é Ás) = 4/52
+- Qual a probabilidade de sortear dois ases no baralho?
+- A = a primeira carta é Ás
+- B = a segunda carta é Ás
+- A e B não são eventos independentes! Se A acontece, as chances de B acontecerem diminuem para 3/51!
+
+## Probabilidade condicional
+
+- A = a primeira carta é Ás
+- B = a segunda carta é Ás
+- P(B|A) = 3/51  (a probabilidade de a segunda ser Ás dado que a primeira foi Ás)
+- Isso é chamado de probabilidade condicional.
+
+## Probabilidade de dois resultados dependentes
+
+P(A e B) = P(A) * P(B|A)
+
+[!['Dude, wait -- I'm not American! So my risk is basically zero!'](https://imgs.xkcd.com/comics/conditional_risk.png)](https://xkcd.com/795/)
+
+## Tópicos opcionais em probabilidade
+
+- (ver [slides](https://docs.google.com/presentation/d/1H4_XZRhjrZnxABet_IXejwPu72e3XlgNoOgZtFrp6oM/edit?usp=sharing))
+- Problema de Monty Hall (opcional, dinâmica durante a chamada)
+- Teorema de Bayes (opcional)
+  - Ex.: filtragem de spam
+  - Ex.: HIV (O andar do bêbado)
+
+# Estimativa
+
+## Estimativa: definição
+
+- É um valor aproximado de um parâmetro da população obtido a partir de uma amostra
+- Pode ser também o processo de encontrar esse valor (do verbo *estimar*)
+
+## Parâmetro e estatística
+
+- Parâmetro é uma característica da população
+    - Ex.: média de altura dos cidadãos brasileiros
+- Estatística é uma característica de uma amostra
+    - Ex.: média de altura de uma amostra dos cidadãos brasileiros
+- Estimar: determinar um parâmetro a partir de uma estatística
+
+## Estimativa: tipos
+
+- Uma estimativa pode ser
+    - pontual
+    - intervalar
+
+## Estimativa pontual
+
+- Consiste de um único valor
+- Ex.: se média da amostra = 1,73, então estima-se que a média da população = 1,73
+- Problema: a estimativa pontual não representa incertezas
+- Se pegar outra amostra, a estimativa pontual vai ser a mesma?
+
+<!-- - Se eu pegar várias amostras e plotar um histograma das estimativas pontuais, obtenho a distribuição amostral -->
+
+## Estimativa intervalar
+
+- A estimativa é dada por um intervalo de confiança
+- Intervalo de confiança: faixa de valores associada a um nível de confiança
+- Nível de confiança: probabilidade de um parâmetro estar incluído em uma faixa de valores
+- Estimativa intervalar: estatística ± margem de erro
+- Exemplo de uso: a estimativa da média de altura das mulheres brasileiras é de 1,60 ± 0,07 m, com 95% de confiança.
+
+## Tamanho da amostra, nível de confiança, desvio-padrão
+
+- Suponha que a UFBA possui 40 mil alunos
+- Suponha que sabemos, com certeza, que a média de altura desses alunos é 1,70 m (parâmetro).
+- 
+
+
+
+- Intervalo de confiança
+  - Definição (estimativa pontual ± margem de erro)
+  - Nível de confiança
+  - Figura 4.8 (openintro.org/stats)
+  - Variar nível de confiança e verificar a variação do tamanho do intervalo de confiança
+  - Cálculo do tamanho da amostra:
+    - tamanho da amostra, nível de confiança, margem de erro, desvio-padrão da população
+- Mostrar exemplos para estimativa de proporção (variáveis categóricas)
+
+
+
+
+<!--
+- Ex.: uma amostra de 20 pessoas tem 6% de chance de ter 70% ou mais de mulheres
+-->
+
+
+
+
+
+
+
+
