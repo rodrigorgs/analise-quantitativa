@@ -515,7 +515,7 @@ chisq.test(tab)
 
 - Pode ser medido com o V de Cramer.
 
-```{r echo=T}
+```{r}
 library(vcd)
 tab <- xtabs(~ prioritario + severo, data=bugs2)
 assocstats(tab)$cramer
@@ -536,6 +536,157 @@ assocstats(tab)$cramer
 <https://marcoarmello.wordpress.com/2012/05/17/qualteste/>
 
 ![](https://marcoarmello.files.wordpress.com/2012/05/qual-teste-estatistico-marco-mello-001.png)
+
+<!--
+
+# Correlação e regressão
+
+## Introdução
+
+- Correlação e regressão são métodos para estimar o relacionamento entre duas variáveis numéricas
+
+## Correlação
+
+- É uma medida da dependência entre duas variáveis
+- Exemplo mais comum é a correlação linear
+
+## Correlação linear
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Correlation_examples2.svg/506px-Correlation_examples2.svg.png)
+
+## Correlação linear
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Anscombe%27s_quartet_3.svg/640px-Anscombe%27s_quartet_3.svg.png)
+
+## Correlação: exemplo em R
+
+```{r echo=T}
+# Data set mtcars:
+#   mpg = milhas por galão (consumo)
+#   hp = horsepower
+plot(mtcars$hp, mtcars$mpg) 
+```
+
+## Correlação: exemplo em R
+
+```{r echo=T}
+cor.test(mtcars$hp, mtcars$mpg)  ## teste de significância
+
+# uma correlação pode ser alta e
+# não ser estatisticamente significativa!
+```
+
+## Métodos de correlação
+
+- Correlação linear de Pearson (paramétrico). Pressupostos: normalidade, ausência de outliers, linearidade e homocedasticidade.
+- Correlação de Spearman (não-paramétrico). Mede se existe uma relação monotônica entre as variáveis (ex.: as duas crescem ou as duas diminuem).
+- Correlação de Kendall (não-paramétrico). Como Spearman, porém mais adequado quando há valores iguais e amostras pequenas
+- Cada método tem seus pressupostos
+
+## Correlação de Spearman
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Spearman_fig1.svg/507px-Spearman_fig1.svg.png)
+
+## Correlação de Spearman: exemplo em R
+
+```{r echo=T}
+cor.test(mtcars$hp, mtcars$mpg, method="spearman") 
+```
+
+## Regressão linear
+
+- A regressão linear, além de medir a força da dependência entre duas variáveis (como a correlação), também estima os parâmetros da reta que relaciona as variáveis
+- É uma técnica para **modelagem estatística**
+- Regressão linear: estimar a e b na equação linear y = ax + b de forma a obter a reta que se ajusta melhor nos dados
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Linear_regression.svg/438px-Linear_regression.svg.png)
+
+## Regressão linear: exemplo em R
+
+```{r echo=T}
+modelo <- lm(mpg ~ hp, data=mtcars)
+plot(mtcars$hp, mtcars$mpg)
+abline(modelo, col="red")
+```
+
+## Regressão linear: exemplo em R
+
+```{r echo=T}
+print(modelo)
+```
+
+## Regressão linear: exemplo em R
+
+Note a relação com a correlação de Pearson (R^2, p-value)
+
+```{r echo=T}
+summary(modelo)
+```
+
+## Regressão múltipla (2 ou mais variáveis independentes)
+
+```{r echo=T}
+modelo <- lm(formula = mpg ~ hp + wt + cyl, data = mtcars)
+summary(modelo)
+```
+
+## Regressão logística
+
+- Tipo de regressão em que a variável de saída (dependente) é binária
+- Logit para os íntimos
+
+![](https://upload.wikimedia.org/wikipedia/commons/6/6d/Exam_pass_logistic_curve.jpeg)
+
+## Regressão logística: exemplo em R
+
+```{r echo=T}
+# vs: tipo de motor (0 = V, 1 = straight)
+library(MLmetrics)
+logreg <- glm(formula = vs ~ hp + wt,
+              family = binomial(link = "logit"), data = mtcars)
+pred <- ifelse(logreg$fitted.values < 0.5, 0, 1)
+Accuracy(y_pred = pred, y_true = mtcars$vs)
+Precision(y_pred = pred, y_true = mtcars$vs)
+Recall(y_pred = pred, y_true = mtcars$vs)
+```
+
+## Regressão logística
+
+- O modelo de regressão logística prevê o valor da variável de saída (0 ou 1)
+- O valor pode estar certo ou errado
+- Podemos montar uma tabela de contingência com a combinação resultado real, resultado previsto
+
+## Tabela de contingência
+
+```{r echo=T}
+x <- data.frame(real=mtcars$vs, obtido=pred)
+xtabs(~ real + obtido, data=x)
+```
+
+## Positivos e negativos, verdadeiros e falsos
+
+![](http://image.slidesharecdn.com/sensitivityspecificity-131211204625-phpapp02/95/sensitivity-specificity-31-638.jpg?cb=1386794848)
+
+## Precisão e recall
+
+![](https://qph.ec.quoracdn.net/main-qimg-18cd74b05b850406e1c01b76b1cb8fd6?convert_to_webp=true)
+
+## Precisão e recall
+
+![](https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcR4SzpYXvPStG8yvcdcxCH_AJzpFhP4S2IoDJTSbftxtLEV9fyMIA)
+
+## Precisão e recall
+
+- O que é mais importante? Alta precisão ou alto recall?
+- Depende da aplicação
+- Ex.: queremos prever o resultado de uma build com base nas características do commit
+
+## F-measure
+
+- Ponderação entre precisão e recall
+- F = 2 * precisão * recall / (precisão + recall)
+
+-->
 
 # Referências
 
