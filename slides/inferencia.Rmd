@@ -1,0 +1,551 @@
+---
+title: "Teste de hipótese"
+author: "Rodrigo Rocha"
+date: "12/10/2016"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(dplyr, warn.conflicts = FALSE)
+set.seed(0)
+
+library(MASS) # sample
+survey <- MASS::survey
+files <- read.csv(gzfile('data/eclipse-metrics.csv.gz'))
+bugs <- readRDS('data/netbeans-platform-bugs.rds')
+builds <- readRDS('data/travis-sample.rds')
+projects <- builds %>%
+  group_by(gh_project_name) %>%
+  summarise(language = last(gh_lang),
+            teamsize = last(gh_team_size))
+
+files100 <- files %>% filter(version == 3) %>% sample_n(100)
+bugs100 <- bugs %>% sample_n(100)
+builds100 <- builds %>% sample_n(100)
+projects30 <- projects %>% sample_n(30)
+survey30 <- survey %>% sample_n(30)
+```
+# Testes de hipótese: noções gerais
+
+## Testes de hipótese
+
+- Teste estatístico sobre a relação entre conjuntos de variáveis
+    - Ex.: qual a relação entre as alturas de homens e mulheres?
+- Confronta duas hipóteses sobre a variável
+    - **H0**, **hipótese nula**: as diferenças observadas entre as variáveis são devidas ao acaso, coincidência
+    - **Ha**, **hipótese alternativa**: as diferenças observadas são influenciadas por alguma causa não-aleatórias
+
+## Testes de hipótese
+
+- O resultado do teste é o p-valor, i.e., a probabilidade de o resultado observado caso H0 seja verdadeira -- P(resultado|H0)
+    - Se p-valor < alfa, **rejeitamos** H0
+    - Se p-valor >= alfa, **não há evidências para rejeitar** H0
+- O valor alfa é o nível de significância do teste; é comum usar 0.05 (5%). 
+
+## Testes de hipótese: exemplo
+
+- Uma moeda é lançada 30 vezes e resulta em 22 caras. A moeda é justa?
+- Formulação das hipóteses:
+    - H0: a moeda é justa, i.e., P(cara) = P(coroa) = 0.5
+    - Ha: a moeda é enviesada, i.e., P(cara) ≠ P(coroa)
+- p-valor = P(22 caras | moeda justa)
+    - Nesse caso, p = 0.01762 (pode ser calculado com base em regras de probabilidade)
+- Rejeitamos a hipótese nula, e concluímos que há evidências significativas de que a moeda é enviesada
+
+## Testes de hipótese: exemplo em R
+
+```{r echo=T}
+prop.test(22, 30)
+```
+
+## Testes de hipótese: o que não dizer
+
+- Exemplo: P(22 caras | moeda justa) = 0.01762
+- "Há 1.76% de chance de a moeda ser justa"
+- Por que essa afirmação é imprecisa? 
+
+## xkcd
+
+<https://xkcd.com/892>
+
+![](http://imgs.xkcd.com/comics/null_hypothesis.png)
+
+## Erros de decisão
+
+Os testes eventualmente podem levar a conclusões erradas:
+
+- Erro tipo I: rejeitar H0 quando ela é verdadeira.
+    - P(erro tipo I) = alfa
+- Erro tipo II: não rejeitar H0 quando ela é falsa.
+    - P(erro tipo II) é chamado de beta
+
+## Poder do teste
+
+- Normalmente se deseja rejeitar H0
+    - Isso significa encontrar evidências de que sua hipótese sobre uma relação entre variáveis é verdadeira
+- Por isso, buscamos usar o teste estatístico com maior poder que pudermos usar 
+
+------------------
+
+# Teste T
+
+## Escolha de testes de hipótese
+
+- Cada teste serve para um tipo de hipótese
+- Cada teste é adequado para certos tipos de variáveis (categóricas, numéricas...)
+- Cada teste possui pressupostos (*assumptions*) que devem ser atendidos
+    - Do contrário, o p-valor não tem significado
+
+## Teste de t-Student (teste T) para 2 amostras independentes
+
+- Avalia a hipótese alternativa de que duas populações possuem médias diferentes
+- Pressupostos:
+    - **Independência**: os dados de uma amostra são independentes dos dados da outra
+    - **Normalidade**: as duas populações seguem distribuições normais
+    - **Homocedasticidade**: as duas populações possuem a mesma variância (desvio-padrão^2)
+- O teste T é robusto a desvios pequenos e médios dos pressupostos
+
+## Teste T: exemplo em R
+
+```{r echo=T}
+masc <- survey %>% filter(Sex == 'Male')
+fem <- survey %>% filter(Sex == 'Female')
+
+# OBS.: conf.level = 1 - alfa. O padrão é 0.95
+t.test(masc$Height, fem$Height, conf.level = 0.95)
+```
+
+## Teste T: exemplo em R (outra forma)
+
+Teste T pode ser pensado como uma hipótese sobre a relação entre uma variável numérica e uma variável binária (categórica com 2 valores possíveis):
+
+```{r echo=T}
+t.test(survey$Height ~ survey$Sex)
+```
+
+## Teste T: exemplo em R (considerações)
+
+- Note que esse estudo possui uma ameaça à validade externa (generalização das conclusões):
+    - Os dados são de estudantes de estatística da Universidade de Adelaide, Australia (veja no R: `?MASS::survey`) 
+    - A amostra estudada não é uma amostra aleatória de toda a população mundial
+
+## Teste T: avaliando os pressupostos
+
+- Independência: é uma consequência da forma como os dados foram obtidos
+- Normalidade: pode ser avaliado usando testes de normalidade como `shapiro.test` e `ks.test` (ou graficamente com um histograma ou um Q-Q plot)
+- Homocedasticidade: pode ser avaliado usando testes de variância como o `var.test` (ou graficamente com um Q-Q plot)
+
+## Teste T: avaliando normalidade
+
+H0: população possui distribuição normal
+
+```{r echo=T}
+shapiro.test(masc$Height)
+shapiro.test(fem$Height)
+```
+
+## Teste T: avaliando normalidade
+
+```{r echo=T}
+hist(masc$Height)
+```
+
+## Teste T: avaliando normalidade
+
+```{r echo=T}
+hist(fem$Height)
+```
+
+## Teste T: avaliando normalidade
+
+```{r echo=T}
+qqnorm(masc$Height)
+qqline(masc$Height)
+```
+
+## Teste T: avaliando normalidade
+
+```{r echo=T}
+qqnorm(fem$Height)
+qqline(fem$Height)
+```
+
+## Teste T: avaliando homocedasticidade
+
+```{r echo=T}
+var.test(masc$Height, fem$Height)
+```
+
+## Teste T: avaliando homocedasticidade
+
+- Os dados são heterocedásticos!
+- Não tem problema; nesse caso a função `t.test` do R usa o teste T de Welch
+    - adaptação do teste t-Student que lida com o problema da heterocedasticidade
+
+## Teste T: avaliando homocedasticidade
+
+Note a linha: "Welch Two Sample t-test"
+
+```{r echo=T}
+t.test(survey$Height ~ survey$Sex)
+```
+
+## Teste T: avaliando pressupostos (dica)
+
+- Em um artigo, você não precisa mostrar todos esses gráficos e análises para justificar o uso do teste T
+- Simplesmente diga que verificou o pressuposto de normalidade com o teste (*insira aqui o nome do teste que você usou*)
+
+## Teste T pareado
+
+- Igual ao teste T, só que para duas amostras dependentes
+    - duas amostras de mesmo tamanho, cada valor em uma amostra está relacionado ao valor na outra
+    - ex.: medir o desempenho de uma pessoa usando a ferramenta X e usando a ferramenta Y
+- Hipóteses:
+    - H0: a diferença (xi - yi) tem média 0
+    - Ha: a diferença é diferente de 0
+
+## Teste T pareado
+
+- Pressupostos:
+    - **Dependência**: os dados são pareados
+    - **Normalidade**: a diferença entre as variáveis segue uma distribuição normal
+
+## Teste T pareado: checando normalidade
+
+Exemplo: a mão que escreve (`Wr.Hnd`) e a outra mão (`NW.Hnd`) possuem tamanhos diferentes, medidos da ponta do polegar à ponta do dedo mínimo?
+
+## Teste T pareado: checando normalidade
+
+```{r echo=T}
+hist(survey$Wr.Hnd - survey$NW.Hnd)
+```
+
+## Teste T pareado: checando normalidade
+
+```{r echo=T}
+shapiro.test(survey$Wr.Hnd - survey$NW.Hnd)
+```
+
+## Teste T pareado: exemplo em R
+
+A mão que escreve (`Wr.Hnd`) e a outra mão (`NW.Hnd`) possuem tamanhos diferentes, medidos da ponta do polegar à ponta do dedo mínimo?
+
+## Teste T pareado: exemplo em R
+
+(OBS.: nesse caso não devemos usar o teste T pois não atendemos ao pressuposto de normalidade!)
+
+```{r echo=T}
+t.test(survey$Wr.Hnd, survey$NW.Hnd, paired=TRUE)
+```
+
+## Tamanho do efeito e relevância
+
+Resultado estatisticamente significativo nem sempre é significativo:
+
+- A diferença observada pode ser muito pequena
+    - Ex.: A diferença de tempo entre P1 e P2 é de 1 segundo, em média.
+- O resultado pode não ter implicações práticas ou teóricas interessantes
+
+## Tamanho do efeito para T-test
+
+- O tamanho do efeito pode ser calculado com o Cohen's d
+- Pacote r: `effsize`
+- Interpretação do valor de |d|:
+  - 0.1: pequeno
+  - 0.3: médio
+  - 0.5: grande
+  
+## Tamanho do efeito para T-test
+
+```{r}
+library(effsize)
+cohen.d(survey$Height ~ survey$Sex)
+```
+
+# Testes não-paramétricos
+
+## Paramétrico vs não-paramétrico
+
+- O teste T é um teste **paramétrico**, pois assume que os dados seguem uma determinada distribuição
+- E se esse pressuposto não puder ser atendido?
+- Podemos usar testes **não-paramétricos**
+
+## Teste Mann-Whitney
+
+- Equivalente ao teste T para duas amostras independentes
+    - Compara as medianas de duas amostras (*mais ou menos*)
+- Pressupostos:
+    - As duas amostras são independentes
+    - A variável estudada é no mínimo ordinal
+    - As duas amostras possuem a mesma forma (ver [discussão detalhada](https://statistics.laerd.com/premium-sample/mwut/mann-whitney-test-in-spss-2.php))
+
+## Teste Mann-Whitney: exemplo em R
+
+Número de testes executados é diferente comparando projetos em Java e em Ruby?
+
+## Teste Mann-Whitney: exemplo em R
+
+```{r echo=T}
+boxplot(builds100$tr_tests_run ~ builds100$gh_lang)
+```
+ 
+## Teste Mann-Whitney: exemplo em R
+
+```{r echo=T}
+wilcox.test(builds100$tr_tests_run ~ builds100$gh_lang)
+```
+
+## Teste Mann-Whitney: visualização com boxplot
+
+```{r echo=T}
+boxplot(builds100$tr_tests_run ~ builds100$gh_lang)
+```
+
+## Teste de Wilcoxon pareado
+
+- Similar ao teste de Mann-Whitney, para dados pareados
+- Análogo ao teste T pareado, porém não paramétrico
+
+## Teste de Wilcoxon: exemplo em R
+
+Existe diferença entre o número de arquivos adicionados e o número de arquivos removidos em cada build?
+
+## Teste de Wilcoxon: exemplo em R
+
+```{r echo=T}
+boxplot(1+builds100$gh_files_added, 1+builds100$gh_files_modified, log="y")
+```
+
+## Teste de Wilcoxon: exemplo em R
+
+```{r echo=T}
+wilcox.test(builds100$gh_files_added, builds100$gh_files_modified, paired=T)
+```
+
+## Tamanho do efeito
+
+- Para o teste de Mann-Whitney, você pode calcular o tamanho do efeito com o Somers' d
+
+```{r}
+library(Hmisc)
+x <- builds100 %>%
+  filter(!is.na(tr_tests_run) & !is.na(gh_lang)) %>%
+  mutate(java = gh_lang == "java") %>%
+  dplyr::select(tr_tests_run, java)
+somers2(x$tr_tests_run, x$java)
+```
+
+# Sumário: testes para duas amostras, variáveis numéricas
+
+## Testes
+
+|                   | **paramétrico** |    **não-paramétrico**    |
+|-------------------|-----------------|---------------------------|
+| **independentes** | Teste T         | Teste U (Mann-Whitney)    |
+| **pareados**      | Teste T pareado | Teste de Wilcoxon pareado |
+
+Observações:
+
+- nos testes não paramétricos, as variáveis podem ser ordinais
+- quando podem ser aplicados, os testes paramétricos geralmente possuem poder maior que os não-paramétricos
+
+## Funções em R
+
+|                   |     **paramétrico**     |     **não-paramétrico**      |
+|-------------------|-------------------------|------------------------------|
+| **independentes** | `t.test(...)`           | `wilcox.test(...)`           |
+| **pareados**      | `t.test(..., paired=T)` | `wilcox.test(..., paired=T)` |
+
+
+# Tópicos avançados sobre teste de hipótese
+
+## Múltiplos testes
+
+- Você quer avaliar se a moeda usada na Copa do Mundo de 2014 é enviesada através de um experimento: lança a moeda 30 vezes e conta número de caras.
+- Com um lançamento, não foi possível rejeitar H0.
+- Você repete o experimento 100 vezes, até que finalmente o resultado é 22 caras (p < 0.05).
+- Você escreve um artigo dizendo que provou que a moeda da copa é enviesada.
+- O que está errado?
+
+## xkcd
+
+<https://xkcd.com/882/>
+
+![](https://imgs.xkcd.com/comics/significant.png)
+
+## Correção de Bonferroni
+
+- No caso de múltiplos testes de hipótese, deve ser aplicado um fator de correção ao alfa (para rejeitar H0, p < alfa * fator)
+- O método de correção mais simples é a correção de Bonferroni, na qual fator = 1 / n, onde n é o número de repetições
+- Assim, se vamos considerar alfa = 5% e realizar 10 repetições, então só rejeitamos H0 se p < 0,5%
+- A correção de Bonferroni é muito conservadora (existem outras)
+    - i.e., diminui o poder do teste
+    - i.e., fica mais difícil rejeitar H0
+
+## p-hacking
+
+<https://xkcd.com/1478/>
+
+<http://fivethirtyeight.com/features/science-isnt-broken/>
+
+## Variáveis de confusão
+
+- Uso de protetor solar está causa câncer de pele?
+- Significância estatística ≠ causa
+- Exposição ao sol está associado tanto com uso de protetor solar quanto à incidência de câncer de pele
+- Exposição ao sol é uma variável de confusão
+
+# Testes para mais de duas amostras
+
+## Discussão sobre número de amostras
+
+- Até agora, estudamos testes para comparar duas amostras
+    - i.e., uma variável numérica vs. uma variável binária
+    - i.e., consideramos um fator com dois tratamentos
+    - ex.: fator linguagem de programação, tratamentos Java e Ruby
+- E se quisermos comparar três amostras?
+    - ex.: fator linguagem de programação, tratamentos Java, Ruby e Python
+- Solução 1: comparar as amostras duas a duas
+    - Problema: múltiplos testes
+
+## ANOVA
+
+- ANOVA (ANalysis Of VAriance) é um teste para comparar mais de duas amostras
+- Tipos:
+    - [1-way ANOVA](http://www.biostathandbook.com/onewayanova.html): um fator com 3 ou mais tratamentos (ex.: linguagem = Java, Ruby ou Python)
+    - 2-way ANOVA: dois fatores (ex.: linguagem = Java ou Ruby, tamanho da equipe = pequeno ou grande -- nesse caso são quatro amostras)
+    - n-way ANOVA: n fatores
+
+## 1-way ANOVA
+
+- Hipóteses:
+    - H0: todas as amostras possuem a mesma média para a variável analisada
+    - Ha: pelo menos uma das amostras possui média diferente
+- Pressupostos: normalidade, homocedasticidade, independência (como no teste T)
+
+## 1-way ANOVA: exemplo em R
+
+A taxa de batimentos cardíacos depende da frequência de exercício dos alunos (frequente, algum, nenhum)?
+
+```{r echo=T}
+summary(aov(survey$Pulse ~ survey$Exer))
+```
+
+## 2-way ANOVA e n-way ANOVA
+
+- Ver <http://rtutorialseries.blogspot.com.br/2011/02/r-tutorial-series-two-way-anova-with.html>
+
+## Alternativas não-paramétricas ao ANOVA
+
+- Kruskall-Wallis (1-way)
+- Friedman (2-way, unreplicated complete block design)
+
+# Testes de hipótese para números: resumo
+
+## Resumo
+
+- Para duas amostras:
+    - paramétrico: teste T (pareado ou não)
+    - não-paramétrico: Wilcoxon (pareado ou não)
+- Para mais de duas amostras:
+    - paramétrico: ANOVA (1-way, 2-way ou n-way)
+    - não-paramétrico: Kruskall-Wallis (1-way) ou Friedman (2-way)
+
+# Testes para variáveis nominais
+
+## Exemplo de dados nominais
+
+Considere os bugs de um projeto de software, que podem ser classificados quanto à severidade (severo ou não-severo) e prioridade (prioritário e não-prioritário). Podemos sumarizar os dados através de uma tabela de contingência 2x2:
+
+```{r echo=T}
+bugs2 <- bugs %>% mutate(prioritario = priority %in% c('P1', 'P2'),
+         severo = severity %in% c('blocker', 'critical', 'major'))
+tab <- xtabs(~ prioritario + severo, data=bugs2)
+tab
+```
+
+## Exemplo de dados nominais
+
+As duas variáveis (severidade e prioridade) são nominais. Será que elas são independentes? Podemos visualizar com um mosaic plot:
+
+```{r echo=T}
+mosaicplot(tab, shade=T)
+```
+
+## Teste de independência com qui-quadrado   
+
+- O teste do qui-quadrado (chi-squared) pode ser usado para determinar se duas variáveis nominais são independentes ou, equivalentemente, se eles seguem a mesma distribuição
+- Pressupostos:
+    - Menos de 20% das células da tabela de contingência possuem valor < 5.
+    - Os dados não são pareados 
+
+## Qui-quadrado: exemplo em R
+
+A distribuição dos status das builds depende da linguagem de programação? Status = canceled, errored, failed, passed ou started; linguagem = Java ou Ruby.
+
+```{r echo=T}
+tab <- xtabs(~ gh_lang + tr_status, data=builds)
+tab
+```
+
+## Qui-quadrado: exemplo em R
+
+A distribuição dos status das builds depende da linguagem de programação? Status = canceled, errored, failed, passed ou started; linguagem = Java ou Ruby.
+
+```{r echo=T}
+tab <- xtabs(~ gh_lang + tr_status, data=builds)
+chisq.test(tab)
+```
+
+## Teste de McNemar
+
+- Versão do qui-quadrado para testes pareados
+
+## Teste de McNemar: exemplo em R
+
+Existe dependência entre as variáveis binárias prioridade e severidade em bugs?
+
+```{r echo=T}
+tab <- xtabs(~ prioritario + severo, data=bugs2)
+chisq.test(tab)
+```
+
+## Tamanho do efeito
+
+- Pode ser medido com o V de Cramer.
+
+```{r echo=T}
+library(vcd)
+tab <- xtabs(~ prioritario + severo, data=bugs2)
+assocstats(tab)$cramer
+```
+
+# Sumário
+
+## Sumário
+
+- Os testes de hipótese relacionam uma variável numérica ou categórica com uma variável categórica usada para agrupar os dados.
+    - Ex.: teste T é variável numérica vs. categórica
+    - Ex.: teste qui-quadrado é variável categórica vs. categórica
+- E se quisermos relacionar duas variáveis numéricas?
+    - Devemos usar correlação e análise de regressão
+
+## Sumário
+
+<https://marcoarmello.wordpress.com/2012/05/17/qualteste/>
+
+![](https://marcoarmello.files.wordpress.com/2012/05/qual-teste-estatistico-marco-mello-001.png)
+
+# Referências
+
+## Referências
+
+- [The Statistics Tutor's Quick Guide to Commonly Used Statistical Tests](http://www.statstutor.ac.uk/resources/uploaded/tutorsquickguidetostatistics.pdf)
+- <http://www.biostathandbook.com/>
+- <http://www.statmethods.net/>
+- <http://stattrek.com/>
+- <http://www.statsref.com/HTML/index.html>
+- <http://www.itl.nist.gov/div898/handbook/index.htm>
+- <http://www.statstutor.ac.uk/>
+
