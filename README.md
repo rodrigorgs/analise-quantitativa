@@ -23,9 +23,9 @@ Este repositório contém o código-fonte e os dados utilizados na disciplina de
   - Noções de amostragem, probabilidade e estimativa: [código-fonte](slides/estimativa.Rmd) e [slides complementares](https://docs.google.com/presentation/d/1H4_XZRhjrZnxABet_IXejwPu72e3XlgNoOgZtFrp6oM/edit?usp=sharing)
   - Ver análise de artigo, valendo 1,0 ponto, para a próxima aula
 - Aula 4 (23/3)
-  - Teste de hipótese e tamanho de efeito
+  - Teste de hipótese e tamanho de efeito: [código-fonte](slides/inferencia.Rmd) e [slides](http://rpubs.com/rodrigorgs/inferencia)
 - Aula 5 (30/3)
-  - Correlação, regressão e predição
+  - Correlação, regressão e predição: [código-fonte](slides/regressao.Rmd)
 
 ## Avaliações
 
