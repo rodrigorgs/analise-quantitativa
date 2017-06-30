@@ -14,7 +14,7 @@ Este repositório contém o código-fonte e os dados utilizados na disciplina de
     - [Data Transformation Cheat Sheet](https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/data-transformation-cheatsheet.pdf)
 - Aula 2 (29/6)
   - [Transformação de dados (com dplyr)](http://rpubs.com/rodrigorgs/transformacao) - [código-fonte](slides/transformacao.Rmd)
-  - [Gerência de configuração, GitHub e Travis CI](github-ci) (ver abaixo, *Trabalho prático*)
+  - [Gerência de configuração, GitHub e Travis CI](https://github.com/rodrigorgs/analise-quantitativa/blob/master/slides/github-ci.md) (ver abaixo, *Trabalho prático*)
 - Aula 3 (6/7)
   - [Análise exploratória de dados](http://rpubs.com/rodrigorgs/eda) - [código-fonte](slides/eda.Rmd)
   - R Notebook
