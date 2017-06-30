@@ -1,4 +1,4 @@
-# Análise Quantitativa, 2017.1
+# Análise Quantitativa, 2017.1 - lab 144 do IME
 
 Este repositório contém o código-fonte e os dados utilizados na disciplina de Engenharia de Software Experimental, tópico Análise Quantitativa, do Programa de Pós-Graduação em Ciência da Computação da UFBA (PGCOMP).
 
@@ -35,7 +35,7 @@ Este repositório contém o código-fonte e os dados utilizados na disciplina de
 
 Artigo: [Sentiment Analysis of Travis CI Builds](https://rodrigorgs.github.io/files/msr2017-rodrigo.pdf)
 
-Prazo: 06/07/2017 antes do horário da aula, via e-mail para <rodrigorgs@ufba.br>
+Prazo: 20/07/2017 antes do horário da aula, via e-mail para <rodrigorgs@ufba.br>
 
 Elabore uma análise do artigo, em português, contendo os seguintes itens:
 
