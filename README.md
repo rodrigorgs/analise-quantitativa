@@ -53,7 +53,7 @@ Traga dúvidas sobre o artigo para discussão em sala de aula.
 
 ## Trabalho prático (3,0 pontos) - 27/07 13h
 
-- Elaborar um relatório de análise do dataset [TravisTorrent](https://travistorrent.testroots.org/). Você pode encontrar alguns artigos que usaram esse dataset na [programação do MSR 2017](2017.msrconf.org/#/program).
+- Elaborar um relatório de análise do dataset [TravisTorrent](https://travistorrent.testroots.org/). Você pode encontrar alguns artigos que usaram esse dataset na [programação do MSR 2017](http://2017.msrconf.org/#/program).
 - Os resultados devem ser escritos no formato [R Markdown](http://rmarkdown.rstudio.com/) (extensão `.Rmd`).
 - Seções:
   - Introdução: motivação (até dois parágrafos), duas questões de pesquisa
