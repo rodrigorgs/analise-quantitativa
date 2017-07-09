@@ -1,0 +1,131 @@
+---
+title: 'TravisTorrent: exemplo'
+author: "Rodrigo Rocha <rodrigo@dcc.ufba.br>"
+date: "02/10/2016"
+output: html_document
+references:
+- id: beller2015
+  title: When, how, and why developers (do not) test in their IDEs
+  author:
+  - family: Beller
+    given: M
+  - family: Gousios
+    given: G
+  - family: Panichella
+    given: A
+  - family: Zaidman
+    given: A
+  container-title: Proceedings of the 10th Joint Meeting of the European Software Engineering Conference and the ACM SIGSOFT Symposium on the Foundations of Software Engineering (ESEC/FSE)
+  page: 179-190
+  issued:
+    year: 2015
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(dplyr, warn.conflicts = FALSE)
+library(pander, warn.conflicts = FALSE)
+
+# Carrega os dados
+builds <- readRDS('data/travis-sample.rds')
+projetos <- builds %>%
+  group_by(gh_project_name) %>%
+  summarise(num_builds = n())
+```
+
+## Resumo
+
+Os alunos do semestre 2016.1 da disciplina Engenharia de Software Experimental do PGCOMP-UFBA devem escrever um artigo curto no qual apresentarão uma análise qualitativa dos dados contidos no data set TravisTorrent, escolhido para o desafio da conferência Mining Software Repositories de 2017. Os alunos devem escrever o artigo no formato R Markdown, com o qual não estão completamente familiarizados. Com o objetivo de auxiliá-los nesse processo, este artigo fornece um exemplo de como escrever um artigo nos moldes do que foi exigido dos alunos. Espera-se com isso contribuir para que eles escrevam artigos de alta qualidade, demonstrando domínio do conteúdo das aulas.
+
+## Introdução
+
+No decorrer de um curso de mestrado ou doutorado, espera-se que os alunos desenvolvam pesquisa relevante em suas respectivas áreas e demonstrem domínio de ferramentas adequadas para validar os resultados de suas pesquisas. Uma ferramenta importante nesse contexto é a análise quantitativa, que engloba abordagens como estatística descritiva, estatística inferencial e visualização de dados.
+
+Experiências anteriormente vivenciadas pelo autor sugerem que o conhecimento teórico das ferramentas de análise de dados, embora necessário, é insuficiente para que os alunos realizem análises de forma produtiva em suas pesquisas. As evidências sugerem que o domínio de softwares específicos para análise de dados é igualmente importante para viabilizar o uso prático das abordagens.
+
+Por essa razão, neste artigo propomos o ensino da linguagem de programação R simultaneamente ao ensino de conceitos de análise de dados, e a avaliação conjunta dos dois conteúdos a partir de uma atividade prática de escrita de artigos de análise de dados usando a linguagem R. Mais especificamente, propomos como atividade avaliativa a escrita de um artigo no formato [R Markdown](http://rmarkdown.rstudio.com/) a partir da análise de dados do data set [TravisTorrent](https://travistorrent.testroots.org/), disponibilizado no [MSR Challenge 2017](https://2017.msrconf.org/#/challenge), um desafio público de análise de dados.
+
+Considerando a pouca experiência dos alunos com análise quantitativa, com a linguagem R e com o formato R Markdown, este artigo fornece material para quem precisa aprender tais ferramentas. Primeiramente são apresentados links com tutoriais e referências sobre as ferramentas. Além disso, este artigo foi escrito no formato R Markdown e seu código-fonte está disponível online[^1]; portanto, ele pode ser usado como exemplo para a construção de outros artigos.
+
+[^1]: Disponível em <https://raw.githubusercontent.com/rodrigorgs/analise-quantitativa20161/master/exemplo-travis.Rmd>.
+
+### Links relevantes
+
+Links sobre R:
+
+- [R Markdown](http://rmarkdown.rstudio.com/) (excelente guia de referência sobre o formato R Markdown)
+- [Try R](http://tryr.codeschool.com/) (tutorial interativo)
+- [Quick-R](http://statmethods.net/) (site com material de referência)
+- [The Art of R Programming](http://heather.cs.ucdavis.edu/~matloff/132/NSPpart.pdf) (livro sobre R como linguagem de programação)
+- [R in Action](https://www.manning.com/books/r-in-action-second-edition) (livro do autor do site Quick-R)
+
+Links sobre o data set TravisTorrent:
+
+- [MSR Challenge 2017](http://2017.msrconf.org/#/challenge) (página do evento)
+- [TravisTorrent: Synthesizing Travis CI and GitHub for Full-Stack Research on Continuous Integration](http://inventitech.com/publications/2017_beller_gousios_zaidman_travistorrent_synthesizing_travis_ci_and_github_for_full-stack_research_on_continuous_integration.pdf) (descrição do data set)
+- [Oops, my tests broke the build: An analysis of Travis CI builds with GitHub](https://peerj.com/preprints/1984.pdf) (exemplo de análise com o data set)
+- [TravisTorrent](https://travistorrent.testroots.org/) (outras informações sobre o data set)
+- [Amostra do data set com 100 projetos](https://github.com/rodrigorgs/analise-quantitativa20161/blob/master/data/travis-sample.rds) (data set a ser usado na disciplina)
+
+## Metodologia
+
+...
+
+Para responder às questões de pesquisa, utilizamos o data set [TravisTorrent](https://travistorrent.testroots.org/) disponibilizado no [MSR Challenge 2017](https://2017.msrconf.org/#/challenge), que contém ....
+
+```{r}
+linguagens <- builds %>%
+  group_by(gh_lang) %>%
+  summarise(num_builds = n(),
+            num_projetos = n_distinct(gh_project_name))
+
+num_projetos_java <- linguagens %>%
+  filter(gh_lang == 'java') %>%
+  select(num_projetos)
+
+num_projetos_ruby <- linguagens %>%
+  filter(gh_lang == 'ruby') %>%
+  select(num_projetos)
+```
+
+Selecionamos uma amostra aleatória de `r nrow(projetos)` projetos, sendo `r num_projetos_java` em Java e `r num_projetos_ruby` projetos em Ruby.
+
+...
+
+## Resultados
+
+(adaptado do artigo ["Oops, my tests broke the build: An analysis of Travis CI builds with GitHub"](https://peerj.com/preprints/1984/), Seção 4.2, para fins didáticos)
+
+**RQ2.1 Quantos testes são executados por build?** A Figura 1 apresenta um histograma do número de testes executados por build. Como esperado, o histograma segue uma distribuição próxima à distribuição power-law frequentemente observada em estudos empíricos [@beller2015]: a maioria dos projetos executa uma quantidade menor de testes, enquanto alguns executam muitos testes (média: `r mean(builds$tr_tests_run, na.rm=T)`; mediana: `r median(builds$tr_tests_run, na.rm=T)`; 95%: `r quantile(builds$tr_tests_run, 0.95, na.rm=T)`).
+
+```{r fig.cap="**Figura 1**. Número de testes por build por linguagem (escala logarítmica)."}
+hist(builds$tr_tests_run, ylab="Número de builds", main="", xlab="")
+```
+
+```{r}
+mediana_execucoes_testes <- builds %>%
+  group_by(gh_lang) %>%
+  summarise(med_tests_run = median(tr_tests_run, na.rm=T))
+```
+
+A Figura 2 mostra a distribuição de execuções de testes na duas linguagens da nossa amostra; em média, as builds de projetos Ruby executam significantemente mais testes (mediana: `r filter(mediana_execucoes_testes, gh_lang == 'ruby')$med_tests_run`) que builds de projetos Java (mediana: `r filter(mediana_execucoes_testes, gh_lang == 'java')$med_tests_run`), como relevado por um teste de Wilcoxon pareado.
+
+```{r fig.cap="**Figura 2**. Número de testes executados por build (escala logarítmica)."}
+# adiciona 1 para evitar problemas com 0 na escala logaritmica
+builds_mais1 <- builds %>% mutate(tr_tests_run = tr_tests_run + 1)
+boxplot(tr_tests_run ~ gh_lang, data=builds_mais1, log="y", ylab="Testes executados (escala logarítmica)")
+```
+
+```{r}
+p <- wilcox.test(tr_tests_run ~ gh_lang, data=builds)$p.value
+stopifnot(p < 0.05) # dá erro se diferença não for estatisticamente significativa
+```
+
+...
+
+## Conclusão
+
+...
+
+## Referências
+
