@@ -53,14 +53,16 @@ Traga dúvidas sobre o artigo para discussão em sala de aula.
 
 ## Trabalho prático (3,0 pontos) - 27/07 13h
 
-- Elaborar um relatório de análise do dataset [TravisTorrent](https://travistorrent.testroots.org/). Você pode encontrar alguns artigos que usaram esse dataset na [programação do MSR 2017](http://2017.msrconf.org/#/program).
-- Os resultados devem ser escritos no formato [R Markdown](http://rmarkdown.rstudio.com/) (extensão `.Rmd`).
+- Elaborar um relatório de análise do dataset [TravisTorrent](https://travistorrent.testroots.org/). Você pode encontrar alguns artigos que usaram esse dataset na [programação do MSR 2017](http://2017.msrconf.org/#/program). 
+- Os resultados devem ser escritos no formato [R Markdown](http://rmarkdown.rstudio.com/) (extensão `.Rmd`). Veja aqui um [exemplo de análise do TravisTorrent usando R Markdown](https://github.com/rodrigorgs/analise-quantitativa/blob/master/slides/exemplo-travis.Rmd).
 - Seções:
-  - Introdução: motivação (até dois parágrafos), duas questões de pesquisa
+  - Introdução: motivação (até dois parágrafos), questões de pesquisa
   - Metodologia: explicar coleta, transformação e análise
   - Resultados: apresentar análise exploratória e resultado de testes estatísticos
   - Conclusão: impactos, limitações, trabalhos futuros
-- Equipes de até 3 pessoas.
+- Equipes de até 4 pessoas:
+  - Para equipes com até 3 pessoas, o relatório deve conter 2 questões de pesquisa
+  - Para equipes com 4 pessoas, o relatório deve conter 3 questões de pesquisa
 - Entrega até o dia 27/07/2017, às 13:00, por e-mail para <rodrigorgs@ufba.br>, contendo o código `.Rmd` e o link para o relatório [RPubs](https://rpubs.com/).
 - Apresentação da análise em 5 minutos durante a aula do dia 27/07/2017.
 
