@@ -70,7 +70,7 @@ num_projetos_ruby <- linguagens %>%
 <!-- Transformação -->
 Para responder às questões de pesquisa, selecionamos uma amostra aleatória de `r nrow(projetos)` projetos, sendo `r num_projetos_java` projetos em Java e `r num_projetos_ruby` projetos em Ruby.
 
-Para cada build job, consideramos o número de testes executados, reportado no campo `tr_tests_run` do data set...
+Para cada build job, consideramos o número de testes executados, reportado no campo `tr_log_num_tests_run` do data set...
 
 <!-- Análise -->
 Para a RQ1... histograma...
@@ -81,28 +81,28 @@ Para a RQ2... boxplot... teste de Wilcoxon pareado...
 
 (adaptado do artigo ["Oops, my tests broke the build: An analysis of Travis CI builds with GitHub"](https://peerj.com/preprints/1984/), Seção 4.2, para fins didáticos)
 
-**RQ1. Quantos testes são executados por build em projetos que adotam integração contínua?** A Figura 1 apresenta um histograma do número de testes executados por build. Como esperado, o histograma segue uma distribuição próxima à distribuição power-law frequentemente observada em estudos empíricos: a maioria dos projetos executa uma quantidade menor de testes, enquanto alguns executam muitos testes (média: `r mean(builds$tr_tests_run, na.rm=T)`; mediana: `r median(builds$tr_tests_run, na.rm=T)`; 95%: `r quantile(builds$tr_tests_run, 0.95, na.rm=T)`).
+**RQ1. Quantos testes são executados por build em projetos que adotam integração contínua?** A Figura 1 apresenta um histograma do número de testes executados por build. Como esperado, o histograma segue uma distribuição próxima à distribuição power-law frequentemente observada em estudos empíricos: a maioria dos projetos executa uma quantidade menor de testes, enquanto alguns executam muitos testes (média: `r mean(builds$tr_log_num_tests_run, na.rm=T)`; mediana: `r median(builds$tr_log_num_tests_run, na.rm=T)`; 95%: `r quantile(builds$tr_log_num_tests_run, 0.95, na.rm=T)`).
 
 ```{r fig.cap="**Figura 1**. Número de testes por build por linguagem (escala logarítmica)."}
-hist(builds$tr_tests_run, ylab="Número de builds", main="", xlab="")
+hist(builds$tr_log_num_tests_run, ylab="Número de builds", main="", xlab="")
 ```
 
 ```{r}
 mediana_execucoes_testes <- builds %>%
   group_by(gh_lang) %>%
-  summarise(med_tests_run = median(tr_tests_run, na.rm=T))
+  summarise(med_tests_run = median(tr_log_num_tests_run, na.rm=T))
 ```
 
 **RQ2. Existe diferença na quantidade de testes executados por build em projetos escritos em Java e em Ruby?** A Figura 2 mostra a distribuição de execuções de testes na duas linguagens da nossa amostra, em escala logarítmica; o gráfico revela que builds de projetos Ruby tendem a executar mais testes (mediana: `r filter(mediana_execucoes_testes, gh_lang == 'ruby')$med_tests_run`) que builds de projetos Java (mediana: `r filter(mediana_execucoes_testes, gh_lang == 'java')$med_tests_run`). A diferença é estatisticamente significativa para um nível de confiança de 95% de acordo com o teste de Wilcoxon pareado.
 
 ```{r fig.cap="**Figura 2**. Número de testes executados por build (escala logarítmica)."}
 # adiciona 1 para evitar problemas com 0 na escala logaritmica
-builds_mais1 <- builds %>% mutate(tr_tests_run = tr_tests_run + 1)
-boxplot(tr_tests_run ~ gh_lang, data=builds_mais1, log="y", ylab="Testes executados (escala logarítmica)")
+builds_mais1 <- builds %>% mutate(tr_log_num_tests_run = tr_log_num_tests_run + 1)
+boxplot(tr_log_num_tests_run ~ gh_lang, data=builds_mais1, log="y", ylab="Testes executados (escala logarítmica)")
 ```
 
 ```{r}
-p <- wilcox.test(tr_tests_run ~ gh_lang, data=builds)$p.value
+p <- wilcox.test(tr_log_num_tests_run ~ gh_lang, data=builds)$p.value
 stopifnot(p < 0.05) # dá erro se diferença não for estatisticamente significativa
 ```
 
