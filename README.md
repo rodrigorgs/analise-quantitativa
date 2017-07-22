@@ -21,9 +21,9 @@ Este repositório contém o código-fonte e os dados utilizados na disciplina de
   - Visualização de dados (com ggplot2)
     - [R for Data Science: Data visualization](http://r4ds.had.co.nz/data-visualisation.html)
     - [Data Visualization Cheat Sheet](https://www.rstudio.com/wp-content/uploads/2016/11/ggplot2-cheatsheet-2.1.pdf)
-  - Noções de amostragem, probabilidade e estimativa: [código-fonte](slides/estimativa.Rmd) e [slides complementares](https://docs.google.com/presentation/d/1H4_XZRhjrZnxABet_IXejwPu72e3XlgNoOgZtFrp6oM/edit?usp=sharing)
   - Ver análise de artigo, valendo 1,0 ponto, para a próxima aula
 - Aula 4 (20/7)
+  - Noções de amostragem, probabilidade e estimativa: [código-fonte](slides/estimativa.Rmd) e [slides complementares](https://docs.google.com/presentation/d/1H4_XZRhjrZnxABet_IXejwPu72e3XlgNoOgZtFrp6oM/edit?usp=sharing)
   - Discussão do artigo [Sentiment Analysis of Travis CI Builds](https://rodrigorgs.github.io/files/msr2017-rodrigo.pdf) (ver abaixo)
   - Teste de hipótese e tamanho de efeito: [código-fonte](slides/inferencia.Rmd) e [slides](http://rpubs.com/rodrigorgs/inferencia)
 - Aula 5 (27/7)
@@ -63,8 +63,7 @@ Traga dúvidas sobre o artigo para discussão em sala de aula.
 - Equipes de até 4 pessoas:
   - Para equipes com até 3 pessoas, o relatório deve conter 2 questões de pesquisa
   - Para equipes com 4 pessoas, o relatório deve conter 3 questões de pesquisa
-- Entrega até o dia 27/07/2017, às 13:00, por e-mail para <rodrigorgs@ufba.br>, contendo o código `.Rmd` e o link para o relatório [RPubs](https://rpubs.com/).
-- Apresentação da análise em 5 minutos durante a aula do dia 27/07/2017.
+- Entrega até o dia 06/08/2017, às 23:59, por e-mail para <rodrigorgs@ufba.br>, contendo o código `.Rmd` e o link para o relatório [RPubs](https://rpubs.com/).
 
 ## Referências
 
