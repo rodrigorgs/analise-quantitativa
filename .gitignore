@@ -3,3 +3,4 @@ src
 slides/*.html
 .Rproj.user
 .Rhistory
+_private
