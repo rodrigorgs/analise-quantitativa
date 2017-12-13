@@ -135,3 +135,18 @@ Links sobre o data set TravisTorrent:
 - [Oops, my tests broke the build: An analysis of Travis CI builds with GitHub](https://peerj.com/preprints/1984.pdf) (exemplo de análise com o data set)
 - [TravisTorrent](https://travistorrent.testroots.org/) (outras informações sobre o data set)
 - [Amostra do data set com 100 projetos](https://github.com/rodrigorgs/analise-quantitativa/blob/master/data/travis-sample.rds) (data set a ser usado na disciplina)
+
+
+```{r}
+# % de builds bem sucedidas por linguagem
+
+x <- builds %>%
+  group_by(gh_project_name, gh_lang) %>%
+  summarise(p_sucesso = mean(tr_status == 'passed'))
+
+x <- builds %>%
+  group_by(gh_project_name) %>%
+  summarise(num_modifs_doc = sum(gh_diff_doc_files >= 1))
+
+
+```
