@@ -9,14 +9,26 @@ Este repositório contém o código-fonte e os dados utilizados na disciplina de
 
 ## Notas de aula
 
-- Aula 1 (13/2)
-  - [Introdução à disciplina](http://rpubs.com/rodrigorgs/intro) - [código-fonte](slides/intro.Rmd)
-  - [Análise de dados](http://rpubs.com/rodrigorgs/processo) - [código-fonte](slides/processo.Rmd)
-  - [Introdução à linguagem R](http://rpubs.com/rodrigorgs/intro-R_) - [código-fonte](slides/intro-R.Rmd)
-  - Exemplo: Eclipse metrics - [código-fonte](slides/eclipse-metrics.Rmd)
-  - Leituras recomendadas:
-    - [R for Data Science: Data transformation](http://r4ds.had.co.nz/transform.html)
-    - [Data Transformation Cheat Sheet](https://github.com/rstudio/cheatsheets/raw/master/source/pdfs/data-transformation-cheatsheet.pdf)
+Aula 1:
+
+* [Introdução à disciplina](http://rpubs.com/rodrigorgs/intro) - [código-fonte](slides/intro.Rmd)
+* [Análise de dados](http://rpubs.com/rodrigorgs/processo) - [código-fonte](slides/processo.Rmd)
+* [Introdução à linguagem R](http://rpubs.com/rodrigorgs/intro-R_) - [código-fonte](slides/intro-R.Rmd)
+
+Aula 2:
+
+* [Transformação de dados (com dplyr)](http://rpubs.com/rodrigorgs/transformacao) - [código-fonte](slides/transformacao.Rmd)
+* Exemplo: Eclipse metrics - [código-fonte](slides/eclipse-metrics.Rmd)
+
+Aula 3:
+
+* [Análise exploratória de dados](http://rpubs.com/rodrigorgs/eda) - [código-fonte](slides/eda.Rmd)
+
+Aula 4:
+
+* Noções de amostragem, probabilidade e estimativa: [código-fonte](slides/estimativa.Rmd) e [slides complementares](https://docs.google.com/presentation/d/1H4_XZRhjrZnxABet_IXejwPu72e3XlgNoOgZtFrp6oM/edit?usp=sharing)
+* Discussão do artigo [Sentiment Analysis of Travis CI Builds](https://rodrigorgs.github.io/files/msr2017-rodrigo.pdf) (ver abaixo)
+* Teste de hipótese e tamanho de efeito: [código-fonte](slides/inferencia.Rmd) e [slides](http://rpubs.com/rodrigorgs/inferencia)
 
 ## Trabalho prático em equipe
 
