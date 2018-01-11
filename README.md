@@ -27,7 +27,6 @@ Aula 3:
 Aula 4:
 
 * Noções de amostragem, probabilidade e estimativa: [código-fonte](slides/estimativa.Rmd) e [slides complementares](https://docs.google.com/presentation/d/1H4_XZRhjrZnxABet_IXejwPu72e3XlgNoOgZtFrp6oM/edit?usp=sharing)
-* Discussão do artigo [Sentiment Analysis of Travis CI Builds](https://rodrigorgs.github.io/files/msr2017-rodrigo.pdf) (ver abaixo)
 * Teste de hipótese e tamanho de efeito: [código-fonte](slides/inferencia.Rmd) e [slides](http://rpubs.com/rodrigorgs/inferencia)
 
 ## Trabalho prático em equipe
