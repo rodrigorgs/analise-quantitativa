@@ -29,7 +29,7 @@ Aula 4:
 * Noções de amostragem, probabilidade e estimativa: [código-fonte](slides/estimativa.Rmd) e [slides complementares](https://docs.google.com/presentation/d/1H4_XZRhjrZnxABet_IXejwPu72e3XlgNoOgZtFrp6oM/edit?usp=sharing)
 * Teste de hipótese e tamanho de efeito: [código-fonte](slides/inferencia.Rmd) e [slides](http://rpubs.com/rodrigorgs/inferencia)
 
-## Trabalho prático em equipe
+## Trabalho prático em equipe - Prazo: 6/2/2018
 
 - Elaborar um relatório de análise de um data set a sua escolha. Você pode encontrar alguns [data sets nesta página](https://rodrigorgs.github.io/msr-datasets).
 - Os resultados devem ser escritos no formato [R Markdown](http://rmarkdown.rstudio.com/) (extensão `.Rmd`). Veja aqui um [exemplo de análise do TravisTorrent usando R Markdown](https://raw.githubusercontent.com/rodrigorgs/analise-quantitativa/master/slides/exemplo-travis.Rmd).
@@ -38,7 +38,7 @@ Aula 4:
   - Metodologia: explicar coleta, transformação e análise
   - Resultados: apresentar análise exploratória e resultado de testes estatísticos
   - Conclusão: impactos, limitações, trabalhos futuros
-- Entrega por e-mail para <rodrigorgs@ufba.br>, contendo o código `.Rmd` e o link para o relatório no [RPubs](https://rpubs.com/) -- DATA A CONFIRMAR.
+- Entrega por e-mail para <rodrigorgs@ufba.br>, contendo o código `.Rmd` e o link para o relatório no [RPubs](https://rpubs.com/).
 
 ## Referências
 
