@@ -1,0 +1,148 @@
+---
+title: " TRAVIS: Uma análise comparativa das linguagens Java e Ruby" 
+author: 'EQUIPE: JÚLIA CAMPOS <julia.campos31@gmail.com>, FABIO SALES <fosales@gmail.com>, IGOR ASSIS <guinho.assis@gmail.com>, FRANKLIN CASTRO <franklinrene_castro@hotmail.com>'
+date: "06 de Agosto de 2017"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+```
+_____
+## Introdução
+
+Os casos de teste são um conjunto de condições utilizadas na engenharia de software para garantir que o software funcione de acordo com os requisitos funcionais e não funcionais estabelecidos anteriormente, dessa forma, aumentando a produtividade e evitando o retrabalho da equipe de desenvolvimento. A produtividade de uma linguagem de programação pode ser medida de várias formas, como por exemplo: a partir da quantidade de erros ao longo do trabalho, da curva de aprendizagem da linguagem utilizada, da quantidade de linhas de código, dos casos de teste, etc.	
+
+A motivação para este trabalho é analisar a produtividade da linguagem de programação Java quando comparada com a linguagem de programação Ruby, levando em consideração a quantidade de linhas de código escritas e a quantidade de pessoas na equipe, além de analisar se a construção de caso de teste propicia uma maior taxa de sucesso na execução de jobs, consequentemente, menor é o tempo gasto com retrabalho.  
+Para desenvolver a análise foram elaboradas as seguintes questões de pesquisa: 
+
+**R1: Levando em consideração a quantidade de linhas de código escritas e a média do tamanho da equipe, é correto afirmar que a linguagem de programação Java é mais produtiva do que a linguagem de programação Ruby?**   
+
+**R2: Considerando a média de falha nos casos de teste é correto afirmar que a linguagem de programação Java possui menos erros do que a linguagem de programação Ruby?**  
+
+**R3: Os jobs que possuem casos de teste são menos suscetíveis à falhas do que os que não possuem?**   
+
+**R4: Os jobs que possuem casos de teste, se escritos em java, falham menos do que os jobs que possuem casos de teste escritos em Ruby? ** 
+
+**R5: Levando em consideração a média da quantidade de casos de teste, é correto afirmar que a quantidade de casos de teste influência na quantidade de sucesso dos jobs?**
+
+
+_____
+## Metodologia 
+
+Para a elaboração do trabalho foi realizada uma pesquisa empírica na qual foram analisados **2.640.006** registros colhidos da base de dados “travis-sample”, resumo da base de dados do Travis Torrent, que foi disponibilizada na página do professor Rodrigo Rocha. Para coletar os dados importantes para cada questão de pesquisa foi utilizada a biblioteca "dply" do R, que permite utilizar as funções group by, filter, etc., permitindo diferentes manipulações nas tabelas da base de dados. 	Na fase de transformação dos dados, foram realizados diferentes agrupamentos, de acordo com as propriedades de cada questão, além da retirada de valores “NA” de algumas tabelas, permitindo, desta forma, a execução de alguns cálculos. Outra transformação foi a retirada dos outliers no momento de elaborar o gráfico da questão R1, uma vez que existiam valores muito discrepantes em relação às medições geradas no gráfico.
+
+Após o agrupamento e a análise dos dados foram gerados gráficos do tipo boxplot e barras,  nos quais podem ser visualizados os resultados gerados. Depois da plotagem dos gráficos foi realizada a validação dos dados a partir do teste de Wilcoxon, no qual é verificada a veracidade de hipóteses não paramétricas. Neste teste a veracidade da hipótese é calculada a partir do valor de “P”,  e **caso p-value < 0.5 a hipótese nula é considerada falsa**, logo a hipótese descrita pelo pesquisador é verdadeira.  
+
+## Carrega os dados
+```{r ejcarga}
+travis <- readRDS("travis-sample.rds")
+```
+_____
+##Resultados
+
+**R1. Levando em consideração a quantidade de linhas de código escritas e a média do tamanho da equipe, é correto afirmar que a linguagem de programação Java é mais produtiva do que a linguagem de programação Ruby?** 
+
+A pergunta foi respondida a partir da utilização das seguintes colunas: gh_team_size, gh_sloc, agrupadas por gh_project_name e gh_lang. Em seguida foi realizada a validação dos dados a partir do teste de Wilcoxon, sendo verificado o valor do  **p-value = 1.671e-11, como p<0.5,** indicando que a hipótese nula foi rejeitada. Logo, podemos afirmar que é verdade que em relação a linhas de código e tamanho da equipe, a linguagem de programação Java é mais produtiva do que a linguagem de programação Ruby. 
+
+Após agrupamento, sumarização dos dados e a validação da hipótese, os resultados gerados foram plotados em um gráfico do tipo Boxplot, no qual os valores são divididos em quartis, estando o menor valor representado na barra inferior, a mediana representada por uma barra acima do segundo quartil, e o maior valor representado através da barra superior 
+
+```{r ej1}
+travis <- readRDS("travis-sample.rds")
+njobs_r1 <- travis  %>%
+group_by(gh_project_name, gh_lang)  %>%
+summarise(max_build_id = max(tr_build_id, digits = 0), mean_team_size = mean(gh_team_size), mean_gh_sloc = mean(gh_sloc), mean_pessoa_linha_codigo = mean_gh_sloc/mean_team_size)
+
+boxplot(njobs_r1$mean_pessoa_linha_codigo ~ njobs_r1$gh_lang, outline = F, main="Produtividade por quantidade de linhas de codigo", xlab="Linguagem de programacao", ylab="Tamanho da equipe")
+
+wilcox.test(njobs_r1$mean_team_size, njobs_r1$mean_gh_sloc, paired = T, conf.level = 0.95)
+```
+
+
+**R2: Considerando a média de falha nos casos de teste é correto afirmar que a linguagem de programação Java possui menos erros do que a linguagem de programação Ruby?**
+
+Para realizar esta análise foram estudadas as seguintes colunas: gh_lang, que possui o nome da linguagem de programação e tr_log_num_tests_failed, que possui a quantidade de testes que falharam. Como haviam algumas células na tabela sem valores, foi necessário a utilização da função **na.rm=TRUE**, para remover os valores NA da tabela.   
+
+A validação dos dados foi realizada a partir do teste de Wilcoxon, apresentando **p-value = 0.5** , dessa forma, a hipótese nula é negada e podemos afirmar que a hipótese representada na pergunta é verdadeira.
+
+```{r ej2}
+njobs_r2 <- travis %>%   group_by(gh_lang) %>% summarise(mean_tr_log_num_tests_failed = mean(tr_log_num_tests_failed, na.rm=TRUE))
+
+barplot(njobs_r2$mean_tr_log_num_tests_failed, space = F, names=c("Java","Ruby"), col= c("dark blue","light blue"), main = "Testes que falharam", ylab = "Falhas", xlab = "Linguagem de programacao")                                                                                                        
+
+wilcox.test(njobs_r2$mean_tr_log_num_tests_failed, conf.level = 0.95)
+```
+
+**R3: Os jobs que possuem casos de teste são menos suscetíveis à falhas do que os que não possuem?**
+
+Para responder esta pergunta foram usadas as seguintes colunas: build_successful, que apresenta os valores "true" quando a build foi compilada com sucesso e "false" caso contrário, tr_log_bool_tests_ran que apresenta o valor “true” quando houve caso de teste e “false” quando não houve casos de teste e num_jobs, que representa o número de jobs executados.
+
+Os resultados foram apresentados em um gráfico de barras, no qual as barras representam a presença ou não de casos de testes.
+A validação dos resultados foi realizada através da aplicação do teste de wilcoxon, apresentando o valor p-value = 0.5, dessa forma validando a hipótese de que jobs com casos de teste são menos suscetíveis a falhas do que os que não possuem casos de teste.
+
+```{r ej3}
+tab <- xtabs(~ tr_log_bool_tests_ran + build_successful, data=travis)
+mosaicplot(tab)
+chisq.test(tab)
+
+travis %>% group_by(tr_log_bool_tests_ran) %>%
+  summarise(p_successful = mean(build_successful))
+
+njobs_r3 <- travis %>% 
+filter(build_successful == 'FALSE') %>% 
+group_by(tr_log_bool_tests_ran, build_successful) %>% summarise(num_jobs = n())
+
+barplot(njobs_r3$num_jobs, space = F, names=c("Sem caso de teste","Com caso de teste"), col= c("dark blue","red"), main = "Jobs que falharam", ylab = "Quantidade de jobs")
+
+wilcox.test(njobs_r3$num_jobs, conf.level = 0.95)
+
+```
+
+V = 3, p-value = 0.5
+
+**R4: Os jobs que possuem casos de teste, se escritos em java, falham menos do que os jobs que possuem casos de teste escritos em Ruby?**
+
+Para responder esta pergunta foram utilizadas as colunas tr_log_bool_tests_ran, que apresenta o valor “true” se foram utilizados casos de teste e o valor “false” se não foram utilizados casos de teste; build_successful, que apresenta o valor “true” caso a build tenha sido compilada com sucesso e “false” caso contrário; e num_jobs, que apresenta a quantidade de jobs que foram analisados.
+Os dados foram validados a partir do teste de Wilcoxon, apresentando o resultado p-value = 0.5, logo, confirmando a hipótese apresentada na pergunta.
+Os dados foram apresentados em um gráfico de barras, conde são apresentados a quantidade de jobs em Java e em Ruby que foram testados.
+
+```{r ej4}
+njobs_r4 <- travis %>% filter(tr_log_bool_tests_ran == 'TRUE', build_successful == 'FALSE') %>%    group_by(tr_log_bool_tests_ran, gh_lang ,build_successful) %>% summarise(num_jobs = n())
+
+barplot(njobs_r4$num_jobs, space = F, names=c("Java","Ruby"), col= c("dark blue","light blue"), main = "Falhas por caso de teste", ylab = "Falhas", xlab = "Linguagem de programacao")
+
+wilcox.test(njobs_r4$num_jobs, conf.level = 0.95 )
+```
+
+**R5: Levando em consideração a média da quantidade de casos de teste, é correto afirmar que a quantidade de casos de teste influência na quantidade de sucesso dos jobs?**
+
+Os dados foram analisados a partir do agrupamento das colunas gh_lang, que apresenta o nome da linguagem de programação que está sendo analisado; build_successful que apresenta “true” caso a build tenha sido compilada com sucesso e “false” caso contrário. Foi utilizada também a média do número de testes realizados em cada linguagem de programação. Depois foram apresentados em um gráfico de barras no qual houve a seguinte divisão: no lado esquerdo são apresentados os sucessos e as falhas dos testes em Java e do lado direito foram apresentados os sucessos e as falhas das testes em Ruby. A validação da hipótese foi realizada a partir do teste de Wilcoxon, tendo com resultado  p-value = 0.125, dessa forma validando a hipótese apresentada.
+
+
+```{r ej5}
+njobs_r5 <- travis %>% group_by(gh_lang, build_successful) %>% summarise(mean_num_test = mean(tr_log_num_tests_ok, na.rm=TRUE))
+
+z <- matrix(c(njobs_r5$mean_num_test[1], njobs_r5$mean_num_test[2], njobs_r5$mean_num_test[3], njobs_r5$mean_num_test[4]), 2, 2)
+colnames(z) <- c("Java","Ruby")
+barplot(z, beside=TRUE, main = "Numero de testes por linguagem", col=c("dark blue", "red"), ylab = "Testes")
+legend("topleft", legend=c("Falha", "Sucesso"), fill=c("dark blue", "red"), bty="n")
+
+
+wilcox.test(njobs_r5$mean_num_test, conf.level = 0.95)
+
+```
+
+V = 10, p-value = 0.125
+Como o p-value = 0.125, então podemos afirmar que a hipótese é verdadeira
+
+_____
+##Conclusão
+
+A partir das análises realizadas e dos testes de validação realizado podemos concluir que a linguagem Java é mais produtiva que a linguagem Ruby quando se compara o tamanho da equipe e a quantidade de linhas de código escritas. Chegamos também a conclusão de que os jobs que possuem casos de teste são mais suscetíveis a erros do que os que não possuem, sendo que a linguagem Ruby possui mais erros por caso de teste que a linguagem Java, porém, os jobs em Java que possuem casos de teste tendem a falhar menos que os jobs em Ruby. Quando se trata da  média de casos de teste realizados, podemos concluir que os casos de teste influenciam na quantidade de sucessos, tanto em Java quanto em Ruby.
+
+Entre as dificuldades encontradas podemos citar: Achar o melhor tipo de teste de validação para realizar as modificações necessárias no momento da plotagem de alguns gráficos, tais como o de barras duplas e o boxplot. Como trabalhos futuros podemos citar o uso de amostras maiores para realizar os testes. Pode-se utilizar outros datasets contendo metadados de jobs de outras linguagens de programação e de outros projetos.
+

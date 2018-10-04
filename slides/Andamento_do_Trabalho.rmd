@@ -1,0 +1,305 @@
+---
+title: "Andamento do Trabalho"
+author: "Fernando, Moara, Junior, Luciene"
+date: "17 de julho de 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### problema:
+Estamos tendo problemas com o enconding.
+
+### Pergunta:
+
+Os caracteres especiais estão sendo exibidos normalmente no seu computador?
+
+### Observação:
+
+Já estavamos trabalhando na questão 01 antes de recebermos seu e-mail sujerindo as 2, 3 e 5.
+
+### Questão 01:
+
+Builds com maior quantidade de contribuintes tendem a ter mais falhas?
+
+### Hipótese:
+
+Acreditamos que, com o aumento da equipe o número de falas aumenta.
+
+
+### Importando Biblioteca
+```{r, message=FALSE, }
+library(dplyr)
+library(gmodels)
+
+```
+
+### Importando o dataset
+
+```{r }
+# importando o dataset do arquivo 
+travis.data <- readRDS('data/travis-sample.rds')
+
+```
+
+### Selecionando variáveis
+
+```{r}
+#Selecionando variáveis
+travis.data <- travis.data %>%
+  # selecionando variávies do dataset Travis
+  select(tr_build_id, gh_project_name, gh_team_size, 
+         gh_is_pr,  tr_status, gh_build_started_at, gh_lang ) %>%
+            # Agupando dados por build
+            group_by(tr_build_id) %>%
+              # summarise
+              summarise(gh_project_name=unique(gh_project_name),
+                        gh_team_size=unique(gh_team_size),
+                        tr_status=unique(tr_status),
+                        tr_started_at=unique(gh_build_started_at),
+                        gh_lang=unique(gh_lang ) )
+# imformações sobre o data set após a seleção das variáveis
+summary(travis.data)
+```
+
+### Examinando a variável gh_team_size
+
+### Informações sobre a variável
+```{r}
+# imformações sobre a variável do gh_team_size
+summary(travis.data$gh_team_size)
+
+#Ordenando e observando minimos
+head(arrange(travis.data, gh_team_size))
+#e máximos
+tail(arrange(travis.data, gh_team_size))
+```
+
+### Problema:
+
+Os valores zerados na varável gh_team_size não fazem sentido. Não existe grupo de programadores comzero menbors.
+
+### Solução:
+
+Remover observações com zero membros
+
+```{r}
+# excluindos observações com equipes com zero membors
+travis.data <- filter(travis.data, gh_team_size > 0)
+
+```
+
+###  Examinando a variável gh_team_size após a exclusão das observações
+
+```{r}
+# imformações sobre a variável após exclusão de observações
+summary(travis.data$gh_team_size)
+#Ordenando e observando minimos apos a exclusão de observações
+head(arrange(travis.data, gh_team_size))
+
+```
+
+### Histograma
+
+```{r}
+# Histograma
+hist(travis.data$gh_team_size,  xlab = 'Membros da equipe', ylab ='Builds',
+     main = 'Membros de Equipe por Build', freq =  T)
+```
+
+### Problema:
+
+O histograma dá a falsa impressão de que a maioria dos valores estão abaixo de 10.
+A mediana mostra que metade dos valores estão acima de 7.
+A média e o desvio padrão estão em torno de 10.
+
+### Pergunta:
+
+Existiria uma maneira mais clara de mostrar esse histograma?
+
+### Criando uma variável categórica a partir de gh_team_size
+
+Para uma primeira análise, optamos em dividir a variável team_size em quatro categorias, baseando-se nos quartis.
+
+```{r}
+# criando variável team size como categórica
+travis.data <- mutate(travis.data,  
+                      team_size_factor = if_else(gh_team_size > 13, 'GG',
+                                         if_else(gh_team_size > 7, 'G', 
+                                         if_else(gh_team_size > 3, 'M', 'P'))) %>%
+                      factor(levels = c('P', 'M', 'G', 'GG') )
+                      )
+# imformações sobre a variável após criação
+summary(travis.data$team_size_factor)
+length(travis.data$team_size_factor)
+levels(travis.data$team_size_factor)
+
+# mostrando que não existe ordem entre os fatores
+is.ordered(travis.data$team_size_factor)
+str(travis.data$team_size_factor)
+```
+
+### Criando uma variável ordinal a partir de gh_team_size
+
+```{r}
+# criando variável team size como ordinal
+travis.data <- mutate(travis.data,  
+                      team_size_ordinal =  factor( team_size_factor,
+                                                   ordered = TRUE, 
+                                                   levels = c('P', 'M', 'G', 'GG') )
+)
+
+# imformações sobre a variável após criação
+summary(travis.data$team_size_ordinal)
+length(travis.data$team_size_ordinal)
+levels(travis.data$team_size_ordinal)
+
+# mostrando que existe ordem entre os fatores
+is.ordered(travis.data$team_size_ordinal)
+str(travis.data$team_size_ordinal)
+
+```
+
+### Examinando Variável tr_status
+
+```{r}
+# observando a variável status
+summary(travis.data$tr_status)
+
+# criando variável status categórica
+travis.data <- mutate(travis.data, status_factor = factor(travis.data$tr_status))
+
+# observando os fatores
+summary(travis.data$status_factor)
+```
+
+### Problema:
+
+A categoria 'canceled' não aponta nem sucesso nem fracasso. A categoria 'started' tem valor inespecífico, alem disso, tem-se apenas uma leitura desta categoria.
+
+### Solução:
+
+Eliminar as observações com categoria 'canceled' ou 'started'.
+
+```{r}
+# eliminando as observações com fatores indesejados
+travis.data <- filter(travis.data, status_factor != 'canceled' &
+                                   status_factor !=  'started')
+
+# Eliminando levels filtrados
+travis.data <- mutate(travis.data, status_factor = droplevels(status_factor))
+
+# observando a variável após a eliminação dos fatores indesejados
+summary(travis.data$status_factor)
+
+```
+
+### As categorias 'erroed' e 'failed' representam erros nos testes da Build
+
+A varíavel pode ser representada como um vetor de variáveis boolianas
+
+```{r}
+# criando variável status como lógica
+travis.data <- mutate(travis.data, 
+                      status_logic = if_else(tr_status == 'passed', TRUE, FALSE) )
+# observando variável aós criação
+summary(travis.data$status_logic)
+
+# mostrando que não existe ordem entre os valores lógicos
+is.ordered(travis.data$status_logic)
+str(travis.data$status_logic)
+
+```
+
+### Relacionando variáveis:
+
+Estudando a relação entre a variável categórica status e a variável ordinal team_size
+```{r}
+#criando tabela relacionando as variáveis categóricas
+tabela.Q1.a <- with(travis.data, table(status_factor , team_size_ordinal))
+
+tabela.Q1.a
+
+
+```
+
+### Grafico de barras da tabela Q1.a
+
+```{r}
+barplot(tabela.Q1.a, legend.text = TRUE, col = c('red', 'darkred', 'darkgreen'),
+        main = 'Tamanho de Equipes e Erros na Build (categorias)',
+        xlab = 'tamanho das equipes', ylab = 'Número de Builds')
+```
+
+### Problema:
+
+- O gráfico ficaria mais claro de o euxo y estivesse em porcentagem, mostrando a relação falhas e sucessos em cada ordem.
+- Isto se repete nos dois próximos gráficos.
+- Precisamos entender melhor a correlação medida pela função CrossTable().
+
+### Pergunta:
+
+É possível ajustar a função barplot() para este efeito? 
+
+Estudando a relação entre a variável lógica status e a variável ordinal team_size
+
+```{r}
+tabela.Q1.b <- with(travis.data, table(status_logic , team_size_ordinal))
+
+tabela.Q1.b
+
+```
+
+### Grafico de barras da tabela Q1.b
+
+```{r}
+barplot(tabela.Q1.b, legend.text = TRUE, col = c( 'darkred', 'darkgreen'),
+        main = 'Tamanho de Equipes e Erros na Build (pass or fail)',
+        xlab = 'tamanho das equipes', ylab = 'Número de Builds')
+```
+
+### Gerando tabelas de contingência
+
+Para a tabela tabela.Q1.a
+```{r}
+with(travis.data, CrossTable(team_size_ordinal, status_logic, chisq = T ))
+
+```
+
+Para a tabela tabela.Q1.b
+```{r}
+with(travis.data, CrossTable(team_size_ordinal, status_factor, chisq = T ))
+```
+
+
+### Analisando os dados:
+
+A proporção de erros parece crescer até o terceiro quartil, e decair no trecho final do gráfico.
+
+### Proposta:
+
+Redividir as categorias da variável gh_team_size para estudar melhor seu comportamento
+
+```{r}
+## redividindo os fatores da variável team size
+travis.data <- mutate(travis.data,  
+                      team_size_step = cut(gh_team_size, seq.int(0,43 )))
+str(travis.data$team_size_step)
+
+tabela.Q1.c <- with(travis.data, table(status_logic , team_size_step))
+
+barplot(tabela.Q1.c, legend.text = TRUE, col = c( 'darkred', 'darkgreen'),
+        main = 'Tamanho de Equipes e Erros na Build (pass or fail)',
+        xlab = 'tamanho das equipes', ylab = 'Número de Builds',
+        names.arg = seq.int(1,43))
+
+```
+
+### Perguntas gerais:
+
+- já que a variável de status da build é necessariamente categórica, resolvemos tratar a variável de tamanho da equipe como categórica também. O tratamento das variáveis está correto?
+
+- Como podemos melhorar a representação dos gráficos?
+
+- Tivemos problemas para usar a função cor(). Ela exige que as variáveis correlacionadas seja numéricas. Mesmo quando os métodos utilizados (Kendall e Spearman)que cosntam na literatura como aplicavia à variáveis categóricas. O pacote pspearman, que trataria da correlação de variáeis categóricas, não é mais compatível com a versão atual do R. O comando Crosstable() é adequado para medir a correlação das variáveis em questão?

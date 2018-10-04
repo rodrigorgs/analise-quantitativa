@@ -15,17 +15,19 @@ Este texto apresenta a linguagem R, mostrando como ela pode ser usada para trans
 
 ## RStudio
 
-[RStudio](http://rstudio.org/) é um ambiente integrado de desenvolvimento (IDE) para a linguagem R.
+Usaremos o [RStudio](http://rstudio.org/), que é um ambiente integrado de desenvolvimento (IDE) para a linguagem R.
+
+Ele também está disponível online: ([RStudio Cloud](http://rstudio.cloud/)).
 
 ### Variáveis e operações
 
-O ambiente R inclui um console no qual pode-se digitar expressões e ver o resultado. Exemplo:
+O ambiente R inclui um console no qual pode-se digitar **expressões** e ver o resultado. Exemplo:
   
 ```{r}
 1 + 1
 ```
 
-Como em outras linguagens de programação, pode-se atribuir valores a variáveis. Em R, usa-se o operador de atribuição `<-`. Exemplo:
+Como em outras linguagens de programação, pode-se atribuir valores a variáveis. Em R, usa-se o operador de **atribuição** (`<-`). Exemplo:
   
 ```{r}
 x <- 2
@@ -33,7 +35,7 @@ y <- 3
 x + y
 ```
 
-Também podemos realizar comparações entre os valores. Exemplo:
+Também podemos realizar **comparações** entre os valores. Exemplo:
   
 ```{r}
 x < y
@@ -46,7 +48,7 @@ x == 9
 
 ### Vetores
 
-R possui a estrutura *vetor*, que é uma lista de elementos do mesmo tipo. Pode-se criar um vetor com a função `c`. Exemplo (notas de 4 alunos em duas provas):
+R possui a estrutura **vetor**, que é uma lista de elementos do mesmo tipo. Pode-se criar um vetor usando a notação `c(elemento1, elemento2, ...)`. Exemplo (notas de 4 alunos em duas provas):
   
 ```{r}
 aluno <- c("Fulano", "Sicrano", "Beltrano", "Zutano")
@@ -100,9 +102,7 @@ prova[prova > 5]
 aluno[prova > 5]
 ```
 
-
-
-Também podemos executar funções sobre os vetores:
+Também podemos executar **funções** sobre os vetores:
   
 ```{r}
 # Comprimento do vetor (número de elementos)
@@ -181,9 +181,40 @@ Isso é equivalente a:
 mean(trabalho[!is.na(trabalho)])
 ```
 
+### Obtendo ajuda
+
+Para consultar a documentação de uma função, execute o comando `?nomeDaFuncao`. Exemplo:
+
+```{r}
+?mean
+```
+
+### Instalando pacotes
+
+Use o comando `install.packages("nomeDoPacote")`.
+
+Neste curso usaremos o pacote `tidyverse`, que é na verdade uma coleção de pacotes úteis para análise de dados, e inclui pacotes como `tidyr`, `dplyr`, `ggplot2`, dentre outros.
+
+```
+install.packages("tidyverse")
+```
+
+Depois de instalado, você precisa carregar o pacote usando a função `library(nomeDoPacote)`. Assim:
+
+```{r}
+library(tidyverse)
+```
+
+Alternativamente, você pode carregar somente os pacotes do `tidyverse` que deseja usar. Por exemplo:
+
+```
+library(dplyr)
+library(ggplot2)
+```
+
 ### Data frames
 
-Data frame é uma das estruturas de dados mais importantes do R, e se assemelha muito a uma tabela em um banco de dados ou a uma planilha com certas restrições. Um data frame é uma lista de vetores de mesmo tamanho, onde cada vetor possui um nome e representa uma coluna da tabela. 
+Data frame é uma das estruturas de dados mais importantes do R, e se assemelha muito a uma tabela em um banco de dados ou a uma planilha com certas restrições. Um data frame é uma lista de vetores de mesmo tamanho, onde cada vetor possui um nome e representa uma **coluna** da tabela. 
 
 Geralmente os data frames são lidos a partir de arquivos CSV, xlsx ou outros formatos. O formato CSV é suportado nativamente peo R. Exemplo:
   
@@ -192,16 +223,9 @@ dados <- read.csv('data/tamanhos.txt')
 dados
 ```
 
-Você também pode usar o pacote `readr`, que é mais completo. Para instalar o pacote:
+Você também pode usar a função `read_csv` do pacote `readr` (incluído no pacote `tidyverse`):
 
 ```r
-install.packages('readr')
-```
-
-Para usar o pacote:
-
-```r
-library(readr)
 dados <- read_csv('data/tamanhos.txt')
 ```
 
@@ -230,6 +254,49 @@ ncol(dados)
 summary(dados)
 ```
 
+### Operador pipe
+
+A biblioteca `dplyr` do tidyverse inclui o operador `%>%`, chamado de **pipe** (lê-se "páipe"). Ele pode ser pensado como um cano que transporta os dados do lado esquerdo para o lado direito até chegar no final.
+
+Se você tem uma função no seguinte formato:
+
+```r
+funcao(argumento1, argumento2, argumento3, ...)
+```
+
+... ela pode ser reescrita como
+
+```r
+argumento1 %>% funcao(argumento2, argumento3, ...)
+```
+
+Por exemplo, a instrução a seguir
+
+```r
+tail(dados, 4)
+```
+
+... pode ser reescrita como
+
+
+```r
+dados %>% tail(4)
+```
+
+Usar o operador pipe pode tornar os programas mais legíveis, sobretudo, quando há chamadas de função aninhadas. Exemplo:
+
+```r
+# Calcular o sumário estatístico das 4 primeiras linhas
+summary(head(dados, 4))
+# Calcular o sumário estatístico das 4 primeiras linhas (com pipe)
+dados %>%
+  head(4) %>%
+  summary()
+```
+
+Usando o pipe, as funções aparecem na ordem em que são chamadas.
+
+<!-- 
 ### Operações avançadas com a biblioteca dplyr
 
 Se você ainda não o fez, instale a biblioteca `dplyr`:
@@ -250,7 +317,7 @@ Com a biblioteca dplyr, você pode escrever transformações de dados no seguint
 dados %>% transformacao1(...) %>% transformacao2(...) %>% ...
 ```
 
-O operador `%>%` é chamado de pipe (lê-se "páipe"). Ele pode ser pensado como um cano que transporta os dados do lado esquerdo para o lado direito até chegar no final.
+O operador `%>%` é chamado de **pipe** (lê-se "páipe"). Ele pode ser pensado como um cano que transporta os dados do lado esquerdo para o lado direito até chegar no final.
 
 Na prática o `%>%` pega o resultado da chamada de função à sua esquerda e usa esse resultado como primeiro parâmetro da chamada de função que está à sua direita. Exemplo:
 
@@ -264,7 +331,7 @@ tail(dados)
 dados %>% tail()
 ```
 
-Com o `%>%` o código tende a ficar mais legível. Por exemplo, como calcular a raiz quadrada da soma dos quadrados dos catetos?
+<!-- Com o `%>%` o código tende a ficar mais legível. Por exemplo, como calcular a raiz quadrada da soma dos quadrados dos catetos?
 
 ```{r}
 catetos <- c(3, 4)
@@ -274,7 +341,7 @@ sqrt(sum(catetos ** 2))
 ```{r}
 catetos <- c(3, 4)
 (catetos ** 2) %>% sum() %>% sqrt()
-```
+``` ->
 
 O dplyr possui várias funções de transformação, como veremos a seguir.
 
@@ -379,4 +446,4 @@ Para saber mais:
 - <http://r4ds.had.co.nz/transform.html>
 - <https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html>
 
-  
+   -->

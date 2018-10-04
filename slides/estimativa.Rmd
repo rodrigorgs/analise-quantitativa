@@ -6,6 +6,7 @@ output: ioslides_presentation
 ---
 
 ```{r setup, include=FALSE}
+library(MASS)
 library(knitr)
 library(htmlTable)
 knitr::opts_chunk$set(echo = FALSE)
@@ -30,11 +31,11 @@ library(dplyr, warn.conflicts = F)
 
 ## Amostragem (sampling)
 
-- População = conjunto de dados sobre os quais queremos tirar conclusões
-- Amostra = subconjunto da população que analisaremos
-- Amostragem = processo de seleção de uma amostra da população
+- **População** = conjunto de dados sobre os quais queremos tirar conclusões
+- **Amostra** = subconjunto da população que analisaremos
+- **Amostragem** = processo de seleção de uma amostra da população
 
-Analisar a população inteira pode ser inviável. Podemos analisar apenas uma amostra e generalizar as conclusões... se a amostra for **representativa** da população.
+Analisar a população inteira pode ser inviável. Podemos analisar apenas uma amostra e generalizar as conclusões... isso se a amostra for **representativa** da população.
 
 ## Exemplo
 
@@ -44,7 +45,7 @@ Analisar a população inteira pode ser inviável. Podemos analisar apenas uma a
 - Perguntas:
     - Qual é a amostra?
     - Qual é a população?
-    - A escolha da amostra foi adequada? -- Ela é **enviesada**
+    - A escolha da amostra foi adequada ou é **enviesada** (*biased*)?
 
 ## Evidência anedótica
 
@@ -61,31 +62,33 @@ Os tipos de amostragem mais comuns são:
 
 ## Amostragem por conveniência
 
+<!-- - Ex.: Para tirar conclusões sobre todos os estudantes da UFBA, considerar a amostra dos alunos da disciplina Engenharia de Software Experimental no semestre corrente. -->
+
 - Seleciona os indivíduos que estão mais próximos, mais disponíveis
-- Ex.: Para tirar conclusões sobre todos os estudantes da UFBA, considerar a amostra dos alunos da disciplina Engenharia de Software Experimental no semestre corrente.
-- Ex. real: pesquisa de intenção de voto presidencial por telefone na década de 1940
-- Geralmente não é uma amostra representativa da população -- viés de seleção
+    - Exemplo real: pesquisa de intenção de voto presidencial por telefone na década de 1940 nos EUA
+    - Por que essa amostra é enviesada?
+- Geralmente não resulta em uma amostra representativa da população -- viés de seleção
 - Consequentemente não é possível generalizar os resultados da amostra para a população
 - Pode ser usada em estudos piloto
 
-## Viés de seleção (selection bias)
+## Viés de auto-seleção
 
-- Seleção de indivíduos para análise que resulta em uma amostra não representativa da população
-- Exemplo:
-    - Para entender o cenário de desenvolvimento de software no Brasil, um pesquisador envia um questionário para todos os desenvolvedores de software do Brasil
-    - Apenas 2% dos contactados respondem o questionário (taxa de resposta)
-    - O que se pode concluir?
-    - Viés de auto-seleção. Viés de não-resposta.
-    - Garanta uma taxa de resposta alta para mitigar o viés
+Exemplo:
 
-## Viés de seleção (selection bias)
+- Para entender o cenário de desenvolvimento de software no Brasil, um pesquisador envia um questionário para todos os desenvolvedores de software do Brasil
+- Apenas 2% dos contactados respondem o questionário (taxa de resposta)
+- O que se pode concluir?
+- Viés de não-resposta.
+- Dica: garanta uma taxa de resposta alta para mitigar o viés (ex.: ofereça um prêmio para os participantes)
+
+## Viés de auto-seleção
 
 Um dia desses coloquei um questionário na minha página. Olha só o resultado:
 
 **Você costuma responder a questionários online?**
 
 ```{r}
-pie(table(c(rep("sim", 98), rep("não", 2))))
+pie(table(c(rep("sim", 98), rep("nao", 2))))
 ```
 
 O que posso concluir?
@@ -98,25 +101,33 @@ O que posso concluir?
 
 ## Amostragem aleatória simples
 
-- Note que nenhuma amostragem **garante** que a amostra será representativa
+- Melhor do que por conveniência
+    - Note que nenhuma amostragem **garante** que a amostra será representativa
 - Em uma amostragem aleatória simples dos estudantes da UFBA, posso acabar selecionando, ao acaso, apenas os estudantes desta turma (mas isso é muito improvável!)
 - A representatividade tende a ser maior quando:
     - A amostra é grande; ou
-    - A variância da variável estudada na população é pequena
+    - A variância da variável estudada na população é pequena ("se é todo mundo parecido, tanto faz quem eu escolho")
 
 ## Amostragem estratificada (stratified sampling)
 
 - Divide a população em subgrupos (homens/mulheres, crianças/adolescentes/adultos, iniciante/experiente), denominados estratos
 - Pega uma amostra aleatória simples de cada estrato, de forma que o tamanho de cada amostra seja proporcional ao tamanho do estrato na população
-- É mais efetiva quando cada estrato possui baixa variância
+- É mais efetiva quando cada estrato possui baixa variância (as pessoas de um determinado grupo possuem características similares)
 
 # Probabilidade
 
 ## Probabilidade
 
 - É a medida da chance de um evento ocorrer
-    - P(A): probabilidade do evento A
+    - P(A): probabilidade de o evento A ocorrer
 - Varia entre 0 (impossível) e 1 (certo, inevitável)
+
+## Visões sobre a probabilidade
+
+- Três visões sobre probabilidade:
+  - resultados simétricos
+  - frequência relativa
+  - probabilidade subjetiva
 
 ## Visões sobre a probabilidade
 
@@ -148,11 +159,15 @@ O que posso concluir?
 
 ## Probabilidade de dois resultados independentes
 
+- Dois resultados/eventos são independentes se a ocorrência de um não afeta a probabilidade de o outro ocorrer
 - P(A e B) = P(A) * P(B)
+  - Ex.: probabilidade de obter dois 6 em dois lançamentos de dado
 - P(A ou B) = P(A) + P(B) - P(A e B)
+  - Ex.: probabilidade de obter um 5 ou um 6 em um lançamento de dado
 
 ## Falácia do apostador
 
+- Falácia é um erro de lógica
 - Uma moeda é lançada 5 vezes e o resultado é coroa 5 vezes.
 - Qual é a probabilidade de o resultado ser cara no próximo lançamento?
 
@@ -160,7 +175,8 @@ O que posso concluir?
 
 - Qual a probabilidade de sortear um Ás no baralho? P(carta é Ás) = 4/52
 - Qual a probabilidade de sortear dois ases no baralho?
-- P(1ª carta é Ás e 2ª carta é Ás) = 4/52 * 4/52?
+- P(1ª carta é Ás e 2ª carta é Ás) = 4/52 * 4/52???
+- Os eventos são independentes?
 
 ## Probabilidade condicional
 
@@ -177,11 +193,13 @@ O que posso concluir?
 - P(B|A) = 3/51  (a probabilidade de a segunda ser Ás dado que a primeira foi Ás)
 - Isso é chamado de probabilidade condicional.
 
+## Probabilidade condicional
+
+[!['Dude, wait -- I'm not American! So my risk is basically zero!'](https://imgs.xkcd.com/comics/conditional_risk.png)](https://xkcd.com/795/)
+
 ## Probabilidade de dois resultados dependentes
 
 P(A e B) = P(A) * P(B|A)
-
-[!['Dude, wait -- I'm not American! So my risk is basically zero!'](https://imgs.xkcd.com/comics/conditional_risk.png)](https://xkcd.com/795/)
 
 ## Tópicos opcionais em probabilidade
 
@@ -200,9 +218,9 @@ P(A e B) = P(A) * P(B|A)
 
 ## Parâmetro e estatística
 
-- Parâmetro é uma característica da população
+- **Parâmetro** é uma característica da população
     - Ex.: média de altura dos cidadãos brasileiros
-- Estatística é uma característica de uma amostra
+- **Estatística** é uma característica de uma amostra
     - Ex.: média de altura de uma amostra dos cidadãos brasileiros
 - Estimar: determinar um parâmetro a partir de uma estatística
 
@@ -219,39 +237,96 @@ P(A e B) = P(A) * P(B|A)
 - Problema: a estimativa pontual não representa incertezas
 - Se pegar outra amostra, a estimativa pontual vai ser a mesma?
 
-<!-- - Se eu pegar várias amostras e plotar um histograma das estimativas pontuais, obtenho a distribuição amostral -->
+## Distribuição amostral
+
+- Se eu pegar várias amostras e plotar um histograma das estimativas pontuais, obtenho a distribuição amostral
+- Ver <https://istats.shinyapps.io/sampdist_cont/>
+
+## Distribuição amostral
+
+- Ver <https://speakerdeck.com/jakevdp/statistics-for-hackers?slide=12>
+
+```{r}
+resultado <- c()
+num_experimentos <- 10000
+experimentos_com_22_caras_ou_mais <- 0
+for (i in 1:num_experimentos) {
+  
+  caras <- 0
+  for (lancamento in 1:30) {
+    deu_cara <- sample(c(TRUE, FALSE), 1)
+    if (deu_cara) { caras <- caras + 1 }
+  }
+  resultado[i] <- caras
+  
+  if (caras >= 22) {
+    experimentos_com_22_caras_ou_mais <- experimentos_com_22_caras_ou_mais + 1
+  }  
+}
+
+cat(100 * experimentos_com_22_caras_ou_mais / num_experimentos, '%', sep='')
+hist(resultado)
+abline(v = 22, col = "red")
+```
 
 ## Estimativa intervalar
 
-- A estimativa é dada por um intervalo de confiança
-- Intervalo de confiança: faixa de valores associada a um nível de confiança
-- Nível de confiança: probabilidade de um parâmetro estar incluído em uma faixa de valores
-- Estimativa intervalar: estatística ± margem de erro
-- Exemplo de uso: a estimativa da média de altura das mulheres brasileiras é de 1,60 ± 0,07 m, com 95% de confiança.
+- A estimativa é dada por um **intervalo de confiança**, que é uma faixa de valores e por um **nível de confiança**
+    - **Nível de confiança**: probabilidade de um parâmetro estar incluído no intervalo de confiança
+- Forma de escrever: estatística ± margem de erro
+    - Exemplo: a estimativa da média de altura das mulheres brasileiras é de 1,60 ± 0,07 metros, com 95% de confiança.
+    - 1,60 metros é a estatística (média da amostra)
+    - 0,07 metros é a margem de erro
+
+## Estimativa intervalar
+
+![](2018-10-04-10-47-15.png)
 
 ## Tamanho da amostra, nível de confiança, desvio-padrão
 
-- Suponha que a UFBA possui 40 mil alunos
-- Suponha que sabemos, com certeza, que a média de altura desses alunos é 1,70 m (parâmetro).
-- 
+- Quanto maior o nível de confiança desejado, maior o intervalo
+No extremo, podemos dizer com 100% de confiança que a altura média da população está no intervalo 0 ± ∞
+
+```{r}
+
+genero <- na.omit(survey$Sex) 
+num_mulheres <- sum(genero == "Female")
+tam_amostra <- length(genero)
+
+# Estimativa pontual da proporção de mulheres na população
+num_mulheres / tam_amostra
+
+# Estimativa intervalar
+prop.test(num_mulheres, tam_amostra, conf.level = 0.95)
 
 
+# Resultado:
+#   95 percent confidence interval:
+#   0.4367215 0.5632785
+```
 
-- Intervalo de confiança
-  - Definição (estimativa pontual ± margem de erro)
-  - Nível de confiança
-  - Figura 4.8 (openintro.org/stats)
-  - Variar nível de confiança e verificar a variação do tamanho do intervalo de confiança
-  - Cálculo do tamanho da amostra:
-    - tamanho da amostra, nível de confiança, margem de erro, desvio-padrão da população
-- Mostrar exemplos para estimativa de proporção (variáveis categóricas)
+```{r}
+h = survey$Height[!is.na(survey$Height)] # alturas em cm
+
+# Estimativa pontual
+mean(h)
+
+sample(h, 20) %>% mean()
+
+# Estimativa intervalar
+t.test(h, conf.level = 0.95)
+
+# Resultado da estimativa intervalar:
+#   95 percent confidence interval:
+#   171.0380 173.7237
 
 
+```
 
 
-<!--
-- Ex.: uma amostra de 20 pessoas tem 6% de chance de ter 70% ou mais de mulheres
--->
+## Continuação
+
+https://docs.google.com/presentation/d/1H4_XZRhjrZnxABet_IXejwPu72e3XlgNoOgZtFrp6oM/edit#slide=id.g120a867426_0_16
 
 
 

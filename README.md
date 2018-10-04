@@ -6,18 +6,27 @@ Este repositório contém o código-fonte e os dados utilizados na disciplina de
 
 Aula 1:
 
-* [Introdução à disciplina](http://rpubs.com/rodrigorgs/intro) - [código-fonte](slides/intro.Rmd)
-* [Análise de dados](http://rpubs.com/rodrigorgs/processo) - [código-fonte](slides/processo.Rmd)
-* [Transformação de dados (com dplyr)](http://rpubs.com/rodrigorgs/transformacao) - [código-fonte](slides/transformacao.Rmd)
-* Exemplo: Eclipse metrics - [código-fonte](slides/eclipse-metrics.Rmd)
+* [Introdução à disciplina](http://rpubs.com/rodrigorgs/intro) (ver [código-fonte](slides/intro.Rmd))
+* [Análise de dados](http://rpubs.com/rodrigorgs/processo) (ver [código-fonte](slides/processo.Rmd))
+  * [Quiz sobre tipos de variáveis](https://create.kahoot.it/details/quiz-sobre-tipos-de-variaveis-estatistica/42042ca1-cc95-42a6-8fd0-b151376be288)
+* [Introdução à linguagem R](http://rpubs.com/rodrigorgs/intro-R_) (ver [código-fonte](slides/intro-R.Rmd))
+  * [Quiz sobre R](https://create.kahoot.it/details/quiz-sobre-r/d50b50a0-55f1-4497-a59f-ac84c060ac3e)
+* [R Markdown](https://rmarkdown.rstudio.com/lesson-1.html)
+* [RStudio Primers](https://rstudio.cloud/learn/primers) ou [R for Data Science](http://r4ds.had.co.nz/)
+  * Ver [RStudio Primers: Data Visualization Basics](https://rstudio.cloud/learn/primers/1.1)
+* Exemplo: Eclipse metrics (ver [código-fonte](slides/eclipse-metrics.Rmd))
+* Atividade: coding dojo?
 
 Aula 2:
 
-* [Introdução à linguagem R](http://rpubs.com/rodrigorgs/intro-R_) - [código-fonte](slides/intro-R.Rmd)
-* [RStudio Primers](https://rstudio.cloud/learn/primers)
+* [Transformação de dados (com dplyr)](http://rpubs.com/rodrigorgs/transformacao) (ver [código-fonte](slides/transformacao.Rmd))
+  * [RStudio Primers: Work with Data](https://rstudio.cloud/learn/primers/2) ou [R for Data Science](http://r4ds.had.co.nz/)
 * [Análise exploratória de dados](http://rpubs.com/rodrigorgs/eda) - [código-fonte](slides/eda.Rmd)
+  * [RStudio Primers: Exploratory Data Analysis](https://rstudio.cloud/learn/primers/3.1)
+  * [What is a boxplot?](https://i.vimeocdn.com/video/640873839.webp?mw=1300&mh=732&q=70)
+  * [Quiz sobre distribuição e visualização de dados](https://create.kahoot.it/details/distribuicao-e-visualizacao-de-dados/91e48cf4-c75f-4b41-a184-e8a812963fed)
 
-Aula 3:
+Aula 3:   
 
 * Noções de amostragem, probabilidade e estimativa: [código-fonte](slides/estimativa.Rmd) e [slides complementares](https://docs.google.com/presentation/d/1H4_XZRhjrZnxABet_IXejwPu72e3XlgNoOgZtFrp6oM/edit?usp=sharing)
 
@@ -28,6 +37,11 @@ Aula 4:
 Aula 5:
 
 * continuação
+
+## Leitura complementar
+
+- [Data Fallacies to Avoid](https://www.geckoboard.com/learn/data-literacy/statistical-fallacies/)
+- [Rabiscos sobre o conteúdo da disciplina](sandbox.md)
 
 ## Trabalho prático em equipe - Prazo: 8/11/2018
 
@@ -52,4 +66,5 @@ Estatística:
 
 - [OpenIntro Statistics](https://www.openintro.org/stat/)
 - [Online Statistics Education: An Interactive Multimedia Course of Study](http://onlinestatbook.com/)
+- [Computational and Inferential Thinking: The Foundations of Data Science](https://www.inferentialthinking.com/)
 

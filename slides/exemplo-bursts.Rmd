@@ -1,0 +1,83 @@
+---
+title: "Exemplo com TravisTorrent e commits"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(dplyr, warn.conflicts = FALSE)
+library(tidyr, warn.conflicts = FALSE)
+library(pander, warn.conflicts = FALSE)
+library(bursts)
+
+# Carrega os dados
+travis <- readRDS('data/travis-sample.rds')
+commits <- readRDS('data/commits-sample.rds')
+```
+
+```{r}
+# Relaciona cada build job com os commits correspondentes
+travis_commits <- travis %>%
+  select(tr_job_id, git_all_built_commits) %>%
+  mutate(git_commit_id = strsplit(git_all_built_commits, "#")) %>%
+  unnest(git_commit_id) %>%
+  select(tr_job_id, git_commit_id)
+```
+
+```{r}
+# Cria data frame em que cada linha representa um par (job, commit)
+data <-
+  travis %>%
+  inner_join(travis_commits, by = c("tr_job_id")) %>%
+  inner_join(commits, by = c("git_commit_id", "gh_project_name"))
+```
+
+Número de autores por build, para cada linguagem:
+
+```{r}
+autores_por_build <- data %>%
+  group_by(gh_lang, tr_build_id) %>%
+  summarise(n_autores = n_distinct(author_email))
+
+autores_por_build %>%
+  group_by(gh_lang) %>%
+  summarise(
+    media_autores = mean(n_autores))
+```
+
+Número de autores por projeto, para cada linguagem:
+
+```{r}
+autores_por_projeto <- data %>%
+  group_by(gh_lang, gh_project_name) %>%
+  summarise(n_autores = n_distinct(author_email))
+
+boxplot(n_autores ~ gh_lang, data = autores_por_projeto)
+```
+
+```{r}
+head(commits)
+library(lubridate)
+library(bursts)
+
+data <- commits %>%
+  filter(gh_project_name == 'HubSpot/Singularity') %>%
+  mutate(time = ymd_hms(date)) %>%
+  group_by(time) %>%
+  summarise(gh_project_name = max(gh_project_name),
+            git_commit_id = max(git_commit_id))
+
+k <- kleinberg(data$time)
+bursts <- subset(k, level == 2)
+
+bursts$count <- apply(bursts, 1, function(x)
+  sum(data$time > as.POSIXct(x["start"])
+  & data$time < as.POSIXct(x["end"])))
+days <- as.Date(bursts$end) - as.Date(bursts$start)
+days <- days + 1
+bursts$per.day <- bursts$count %/% as.numeric(days)
+
+#bursts %>% filter(count >= 5)
+bursts
+```
+
