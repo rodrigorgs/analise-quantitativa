@@ -11,7 +11,6 @@ Aula 1:
   * [Quiz sobre tipos de variáveis](https://create.kahoot.it/details/quiz-sobre-tipos-de-variaveis-estatistica/42042ca1-cc95-42a6-8fd0-b151376be288)
 * [Introdução à linguagem R](http://rpubs.com/rodrigorgs/intro-R_) (ver [código-fonte](slides/intro-R.Rmd))
   * [Quiz sobre R](https://create.kahoot.it/details/quiz-sobre-r/d50b50a0-55f1-4497-a59f-ac84c060ac3e)
-* [R Markdown](https://rmarkdown.rstudio.com/lesson-1.html)
 * [RStudio Primers](https://rstudio.cloud/learn/primers) ou [R for Data Science](http://r4ds.had.co.nz/)
   * Ver [RStudio Primers: Data Visualization Basics](https://rstudio.cloud/learn/primers/1.1)
 * Exemplo: Eclipse metrics (ver [código-fonte](slides/eclipse-metrics.Rmd))
@@ -25,9 +24,11 @@ Aula 2:
   * [RStudio Primers: Exploratory Data Analysis](https://rstudio.cloud/learn/primers/3.1)
   * [What is a boxplot?](https://i.vimeocdn.com/video/640873839.webp?mw=1300&mh=732&q=70)
   * [Quiz sobre distribuição e visualização de dados](https://create.kahoot.it/details/distribuicao-e-visualizacao-de-dados/91e48cf4-c75f-4b41-a184-e8a812963fed)
+* [R Markdown](https://rmarkdown.rstudio.com/lesson-1.html)
 
 Aula 3:   
 
+* [R Markdown](https://rmarkdown.rstudio.com/lesson-1.html)
 * Noções de amostragem, probabilidade e estimativa: [código-fonte](slides/estimativa.Rmd) e [slides complementares](https://docs.google.com/presentation/d/1H4_XZRhjrZnxABet_IXejwPu72e3XlgNoOgZtFrp6oM/edit?usp=sharing)
 
 Aula 4:

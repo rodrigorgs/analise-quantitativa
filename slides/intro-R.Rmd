@@ -1,7 +1,7 @@
 ---
 title: "Introdução à linguagem R"
 author: "Rodrigo Rocha"
-date: "2 de março de 2017"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: html_document
 ---
   
@@ -202,7 +202,7 @@ install.packages("tidyverse")
 Depois de instalado, você precisa carregar o pacote usando a função `library(nomeDoPacote)`. Assim:
 
 ```{r}
-library(tidyverse)
+#library(tidyverse)
 ```
 
 Alternativamente, você pode carregar somente os pacotes do `tidyverse` que deseja usar. Por exemplo:
@@ -331,14 +331,15 @@ tail(dados)
 dados %>% tail()
 ```
 
-<!-- Com o `%>%` o código tende a ficar mais legível. Por exemplo, como calcular a raiz quadrada da soma dos quadrados dos catetos?
+<!-- 
+Com o `%>%` o código tende a ficar mais legível. Por exemplo, como calcular a raiz quadrada da soma dos quadrados dos catetos?
 
-```{r}
+```r
 catetos <- c(3, 4)
 sqrt(sum(catetos ** 2))
 ```
 
-```{r}
+```r
 catetos <- c(3, 4)
 (catetos ** 2) %>% sum() %>% sqrt()
 ``` ->
@@ -349,7 +350,7 @@ O dplyr possui várias funções de transformação, como veremos a seguir.
 
 Seleciona apenas as linhas de um data frame que satisfazem à condição fornecida. Exemplo: selecionar apenas as linhas em que a `versao` é igual a 1:
   
-```{r}
+```r
 dados %>% filter(versao == 1)
 ```
 
@@ -357,7 +358,7 @@ Dentro das funções do dplyr, você não precisa escrever `dados$versao`. Note 
 
 Outro exemplo: selecionar apenas as linhas em que o tamanho é maior que 300 ou menor que 30:
   
-```{r}
+```r
 dados %>%
   filter(tamanho > 300 | tamanho < 30)
 ```
@@ -370,7 +371,7 @@ Note que pode-se inserir quebras de linha para deixar o código mais legível se
 
 Com o arrange, você especifica as colunas que devem ser usadas na ordenação, em ordem de prioridade, usando `desc` para especificar ordem descendente. Exemplos:
   
-```{r}
+```r
 dados %>%
   arrange(versao)
 
@@ -380,7 +381,7 @@ dados %>%
 
 Combinando as duas coisas:
   
-```{r}
+```r
 dados %>%
   filter(classe == 'Tela.java') %>%
   arrange(versao)
@@ -390,7 +391,7 @@ dados %>%
 
 Seleciona apenas as colunas especificadas. Exemplo:
   
-```{r}
+```r
 dados %>%
   select(classe, tamanho)
 ```
@@ -399,7 +400,7 @@ dados %>%
 
 Se você quiser extrair uma coluna como vetor:
 
-```{r}
+```r
 dados %>%
   .$tamanho
 ```
@@ -408,7 +409,7 @@ dados %>%
 
 Com o mutate, pode-se criar novas colunas a partir das colunas existentes. Exemplo:
   
-```{r}
+```r
 dados %>%
   mutate(produto = tamanho * versao,
          razao = tamanho / versao)
@@ -418,7 +419,7 @@ dados %>%
 
 Exemplos:
   
-```{r}
+```r
 dados %>%
   summarise(tam_medio = mean(tamanho))
 
@@ -433,7 +434,7 @@ Algumas funções de agregação: `n` (quantidade de valores), `n_distinct` (qua
 
 Você pode agrupar as linhas de acordo com os valores de uma ou mais colunas antes de aplicar o summarise.
 
-```{r}
+```r
 dados %>%
   group_by(classe) %>%
   summarise(tam_medio = mean(tamanho))

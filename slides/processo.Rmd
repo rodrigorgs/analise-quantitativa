@@ -1,7 +1,7 @@
 ---
 title: "Análise de dados"
 author: "Rodrigo Rocha"
-date: "2 de março de 2017"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: ioslides_presentation
 ---
 

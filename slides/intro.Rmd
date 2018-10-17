@@ -1,7 +1,7 @@
 ---
 title: "Engenharia de Software Experimental: Análise Quantitativa"
 author: "Rodrigo Rocha"
-date: "2 de março de 2017"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: ioslides_presentation
 ---
 
@@ -63,7 +63,7 @@ rnorm(n=50, mean = 60, sd=10) %>% plot(type='l', ylim=c(40, 80))
 
 <!-- ## Cientista raiz vs. Nutella
 
-```{r}
+```r
 df <- tribble(
   ~`Cientista raiz`, ~`Cientista nutella`,
   "Vai ao deserto coletar dados", "Usa dados abertos",
