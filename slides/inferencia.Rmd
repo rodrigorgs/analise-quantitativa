@@ -10,8 +10,14 @@ knitr::opts_chunk$set(echo = FALSE)
 library(dplyr, warn.conflicts = FALSE)
 set.seed(0)
 
+library(gridExtra)
+library(ggplot2)
+
 library(MASS) # sample
 survey <- MASS::survey
+masc <- survey %>% filter(Sex == 'Male')
+fem <- survey %>% filter(Sex == 'Female')
+
 files <- read.csv(gzfile('data/eclipse-metrics.csv.gz'))
 bugs <- readRDS('data/netbeans-platform-bugs.rds')
 builds <- readRDS('data/travis-sample.rds')
@@ -28,36 +34,102 @@ survey30 <- survey %>% sample_n(30)
 ```
 # Testes de hipótese: noções gerais
 
-## Testes de hipótese
+## Cenário
 
-- Teste estatístico sobre a relação entre conjuntos de variáveis
-    - Ex.: qual a relação entre as alturas de homens e mulheres?
-- Confronta duas hipóteses sobre a variável
-    - **H0**, **hipótese nula**: as diferenças observadas entre as variáveis são devidas ao acaso, coincidência
-    - **Ha**, **hipótese alternativa**: as diferenças observadas são influenciadas por alguma causa não-aleatórias
+**Hipótese**: acreditamos que a altura média dos homens é maior do que a altura média das mulheres dentre os estudantes Universidade de Adelaide (Austrália)
 
-## Testes de hipótese
+**Metodologia**: obtivemos uma amostra aleatória de 209 estudantes e medimos a altura de cada um. Nessa amostra, a média de altura das mulheres foi de `r mean(fem$Height, na.rm=T)` cm; dos homens foi de `r mean(masc$Height, na.rm=T)` cm.
 
-- O resultado do teste é o p-valor, i.e., a probabilidade de o resultado observado caso H0 seja verdadeira -- P(resultado|H0)
-    - Se p-valor < alfa, **rejeitamos** H0
+**Pergunta**: podemos concluir, com alto grau de confiança, que nossa hipótese sobre **todos** os estudantes da Universidade de Adelaide é verdadeira?
+
+## Solução
+
+Para responder à pergunta, aplicamos o **teste de t-Student** sobre os valores dos dois grupos (alturas de homens e alturas de mulheres)
+
+Obtemos assim um **p-valor** igual a `r t.test(masc$Height, fem$Height)$p.value`
+
+Como o p-valor é menor do que **0.05**, concluímos que nossa hipótese é verdadeira (com 95% de confiança)
+
+(Adicionalmente, pode-se calcular o tamanho do efeito)
+
+*(demonstrar no R)*
+
+## Precisamos entender
+
+- Sempre que queremos investigar uma hipótese sobre uma população a partir de uma amostra, precisamos aplicar um **teste de hipótese**.
+    - Na aula vamos conhecer diversos testes de hipótese e descobrir qual teste aplicar em cada situação
+- Todos os testes resultam em um **p-valor**
+    - Quando o p-valor é menor do que um nível de significância (alfa) pré-estabelecido, concluímos que a diferença observada na amostra é estatisticamente significativa e, portanto, temos confiança de que a diferença observada na amostra também existe na população
+    - significância = 1 - confiança
+
+## Entendendo o p-valor
+
+Considere uma população na qual a média de altura dos homens é exatamente igual à média de altura das mulheres.
+
+Suponha que obtivemos uma amostra de homens e uma amostra de mulheres dessa população, e determinamos que, nessa amostra, a altura média das mulheres é 1 cm maior do que a altura média dos homens.
+
+Nesse caso, é evidente que a diferença observada, de 1 cm, foi obra do acaso. Em outras amostras aleatórias, essa diferença pode diminuir ou até mesmo se inverter. Podemos até afirmar que, dada essa população, é **alta a probabilidade** de se obter ao acaso uma amostra cuja diferença de altura seja de 1 cm ou maior para as mulheres.
+
+## Entendendo o p-valor
+
+Quando aplicamos um teste de hipótese, buscamos mostrar que existe uma diferença entre duas populações; essa é nossa hipótese, chamada de **hipótese alternativa** (H1 ou Ha). Um cético poderia afirmar que não existe diferença; essa é a chamada **hipótese nula** (H0).
+
+Na estatística, assumimos que a hipótese nula é verdadeira a menos que tenhamos uma evidência muito forte de que não é.
+
+No nosso exemplo, a diferença entre a média de altura de homens e mulheres obtida na nossa amostra foi de `r mean(masc$Height, na.rm=T) - mean(fem$Height, na.rm=T)` cm. O p-valor, nesse caso, é a probabilidade de se obter uma diferença igual ou superior a essa em duas amostras provenientes de populações com a mesma média. 
+
+## Entendendo o p-valor
+
+Naturalmente, o p-valor vai depender da magnitude da diferença observada (quanto maior, menos provável que as amostras tenham vindo de populações com mesma média)...
+
+```{r}
+grid.arrange(ncol = 2,
+  ggplot(data.frame(x = c(-4, 4)), aes(x)) +
+    stat_function(fun = function (x) dnorm(x, -0.5, 1), geom = "line") +
+    stat_function(fun = function (x) dnorm(x, 0.5, 1), geom = "line", color = "red"),
+  ggplot(data.frame(x = c(-4, 4)), aes(x)) +
+    stat_function(fun = function (x) dnorm(x, -2, 1), geom = "line") +
+    stat_function(fun = function (x) dnorm(x, 2, 1), geom = "line", color = "red"))
+```
+
+## Entendendo o p-valor
+
+... e da variância da população (quanto maior a variância, mais provável que as amostras tenham vindo de populações com a mesma média)
+
+```{r}
+grid.arrange(ncol = 2,
+  ggplot(data.frame(x = c(-4, 4)), aes(x)) +
+    stat_function(fun = function (x) dnorm(x, -0.5, 1), geom = "line") +
+    stat_function(fun = function (x) dnorm(x, 0.5, 1), geom = "line", color = "red"),
+  ggplot(data.frame(x = c(-4, 4)), aes(x)) +
+    stat_function(fun = function (x) dnorm(x, -0.5, 0.4), geom = "line") +
+    stat_function(fun = function (x) dnorm(x, 0.5, 0.4), geom = "line", color = "red"))
+```
+
+## Entendendo a significância (alfa)
+
+- É comum adotar alfa = 0.05
+- Se p-valor < alfa, rejeitamos H0 (pois o resultado obtido é improvável sob H0)
+    - Se p-valor < alfa, **rejeitamos** H0 (o resultado obtido seria improvável se H0 fosse verdadeiro)
     - Se p-valor >= alfa, **não há evidências para rejeitar** H0
-- O valor alfa é o nível de significância do teste; é comum usar 0.05 (5%). 
 
-## Testes de hipótese: exemplo
+## Outro exemplo
 
 - Uma moeda é lançada 30 vezes e resulta em 22 caras. A moeda é justa?
 - Formulação das hipóteses:
     - H0: a moeda é justa, i.e., P(cara) = P(coroa) = 0.5
     - Ha: a moeda é enviesada, i.e., P(cara) ≠ P(coroa)
-- p-valor = P(22 caras | moeda justa)
+- p-valor = P(≥ 22 caras | moeda justa)
     - Nesse caso, p = 0.01762 (pode ser calculado com base em regras de probabilidade)
 - Rejeitamos a hipótese nula, e concluímos que há evidências significativas de que a moeda é enviesada
 
+<!--
 ## Testes de hipótese: exemplo em R
 
 ```{r echo=T}
 prop.test(22, 30)
 ```
+-->
 
 ## Testes de hipótese: o que não dizer
 
@@ -86,7 +158,18 @@ Os testes eventualmente podem levar a conclusões erradas:
     - Isso significa encontrar evidências de que sua hipótese sobre uma relação entre variáveis é verdadeira
 - Por isso, buscamos usar o teste estatístico com maior poder que pudermos usar 
 
-------------------
+# Testes de hipótese
+
+## Testes de hipótese
+
+Alguns testes que estudaremos:
+
+- Variável numérica
+    - `t.test()`, `wilcox.test()` - podem ser pareados ou não. `wilcox.test()` também pode ser usado com variáveis ordinais
+    - `aov()`, `kruskall.wallis()` - para múltiplas amostras
+- Variável categórica
+    - `chisq.test()`
+    - `mcnemar.test()` - pareado
 
 # Teste T
 
@@ -109,9 +192,6 @@ Os testes eventualmente podem levar a conclusões erradas:
 ## Teste T: exemplo em R
 
 ```{r echo=T}
-masc <- survey %>% filter(Sex == 'Male')
-fem <- survey %>% filter(Sex == 'Female')
-
 # OBS.: conf.level = 1 - alfa. O padrão é 0.95
 t.test(masc$Height, fem$Height, conf.level = 0.95)
 ```
@@ -123,12 +203,13 @@ Teste T pode ser pensado como uma hipótese sobre a relação entre uma variáve
 ```{r echo=T}
 t.test(survey$Height ~ survey$Sex)
 ```
-
+<!-- 
 ## Teste T: exemplo em R (considerações)
 
 - Note que esse estudo possui uma ameaça à validade externa (generalização das conclusões):
     - Os dados são de estudantes de estatística da Universidade de Adelaide, Australia (veja no R: `?MASS::survey`) 
     - A amostra estudada não é uma amostra aleatória de toda a população mundial
+-->
 
 ## Teste T: avaliando os pressupostos
 
@@ -194,7 +275,7 @@ t.test(survey$Height ~ survey$Sex)
 ## Teste T: avaliando pressupostos (dica)
 
 - Em um artigo, você não precisa mostrar todos esses gráficos e análises para justificar o uso do teste T
-- Simplesmente diga que verificou o pressuposto de normalidade com o teste (*insira aqui o nome do teste que você usou*)
+- Simplesmente diga que verificou o pressuposto de normalidade com o teste X (*troque X pelo nome do teste que você usou*)
 
 ## Teste T pareado
 
@@ -211,7 +292,7 @@ t.test(survey$Height ~ survey$Sex)
     - **Dependência**: os dados são pareados
     - **Normalidade**: a diferença entre as variáveis segue uma distribuição normal
 
-## Teste T pareado: checando normalidade
+## Teste T pareado: exemplo
 
 Exemplo: a mão que escreve (`Wr.Hnd`) e a outra mão (`NW.Hnd`) possuem tamanhos diferentes, medidos da ponta do polegar à ponta do dedo mínimo?
 
@@ -287,19 +368,19 @@ Número de testes executados é diferente comparando projetos em Java e em Ruby?
 ## Teste Mann-Whitney: exemplo em R
 
 ```{r echo=T}
-boxplot(builds100$tr_tests_run ~ builds100$gh_lang)
+boxplot(builds100$tr_log_num_tests_run ~ builds100$gh_lang)
 ```
  
 ## Teste Mann-Whitney: exemplo em R
 
 ```{r echo=T}
-wilcox.test(builds100$tr_tests_run ~ builds100$gh_lang)
+wilcox.test(builds100$tr_log_num_tests_run ~ builds100$gh_lang)
 ```
 
 ## Teste Mann-Whitney: visualização com boxplot
 
 ```{r echo=T}
-boxplot(builds100$tr_tests_run ~ builds100$gh_lang)
+boxplot(builds100$tr_log_num_tests_run ~ builds100$gh_lang)
 ```
 
 ## Teste de Wilcoxon pareado
@@ -314,26 +395,26 @@ Existe diferença entre o número de arquivos adicionados e o número de arquivo
 ## Teste de Wilcoxon: exemplo em R
 
 ```{r echo=T}
-boxplot(1+builds100$gh_files_added, 1+builds100$gh_files_modified, log="y")
+boxplot(1+builds100$gh_diff_files_added, 1+builds100$gh_diff_files_modified, log="y")
 ```
 
 ## Teste de Wilcoxon: exemplo em R
 
 ```{r echo=T}
-wilcox.test(builds100$gh_files_added, builds100$gh_files_modified, paired=T)
+wilcox.test(builds100$gh_diff_files_added, builds100$gh_diff_files_modified, paired=T)
 ```
 
 ## Tamanho do efeito
 
 - Para o teste de Mann-Whitney, você pode calcular o tamanho do efeito com o Somers' d
 
-```{r}
+```{r message=F}
 library(Hmisc)
 x <- builds100 %>%
-  filter(!is.na(tr_tests_run) & !is.na(gh_lang)) %>%
+  filter(!is.na(tr_log_num_tests_run) & !is.na(gh_lang)) %>%
   mutate(java = gh_lang == "java") %>%
-  dplyr::select(tr_tests_run, java)
-somers2(x$tr_tests_run, x$java)
+  dplyr::select(tr_log_num_tests_run, java)
+somers2(x$tr_log_num_tests_run, x$java)
 ```
 
 # Sumário: testes para duas amostras, variáveis numéricas
@@ -391,7 +472,7 @@ Observações:
 
 ## Variáveis de confusão
 
-- Uso de protetor solar está causa câncer de pele?
+- Uso de protetor solar causa câncer de pele?
 - Significância estatística ≠ causa
 - Exposição ao sol está associado tanto com uso de protetor solar quanto à incidência de câncer de pele
 - Exposição ao sol é uma variável de confusão
@@ -508,7 +589,7 @@ Existe dependência entre as variáveis binárias prioridade e severidade em bug
 
 ```{r echo=T}
 tab <- xtabs(~ prioritario + severo, data=bugs2)
-chisq.test(tab)
+mcnemar.test(tab)
 ```
 
 ## Tamanho do efeito
