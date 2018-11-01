@@ -37,7 +37,7 @@ Aula 4:
 
 Aula 5:
 
-* continuação
+- Correlação, regressão e predição: [código-fonte](slides/regressao.Rmd) e [slides](http://rpubs.com/rodrigorgs/correlacao-regressao)
 
 ## Leitura complementar
 
