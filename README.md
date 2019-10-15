@@ -46,7 +46,7 @@ Aula 5 (apresentação):
 - [Data Fallacies to Avoid](https://www.geckoboard.com/learn/data-literacy/statistical-fallacies/)
 - [Rabiscos sobre o conteúdo da disciplina](sandbox.md)
 
-## Trabalho prático em equipe
+## Trabalho prático em equipe - prazo: 04/11/2019
 
 - Elaborar um relatório de análise quantitativa de dados a partir de um data set a sua escolha. Você pode encontrar alguns [data sets nesta página](https://rodrigorgs.github.io/msr-datasets).
 - O relatório deve conter duas questões de pesquisa, cada uma envolvendo a relação entre duas variáveis do seu data set, que devem ser respondidas com testes de hipótese. Além disso, ele deve conter uma análise descritiva dos dados.
